@@ -86,48 +86,21 @@ button { cursor: pointer; }
   gap: 8px;
 }
 
-/* Kệ của người chơi cùng */
-.shelf {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas: "brand chip" "coach coach";
-  gap: 8px 12px;
-  align-items: center;
-}
-.brand { grid-area: brand; font: 800 32px/1 var(--font-display); letter-spacing: .01em; }
+/* Kệ trên cùng */
+.shelf { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.brand { font: 800 32px/1 var(--font-display); letter-spacing: .01em; }
+.shelf-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; min-width: 0; }
 .chip {
-  grid-area: chip;
   display: inline-flex; align-items: center; gap: 8px;
   min-height: 44px; padding: 0 14px;
   border: 2px solid var(--line); border-radius: 999px;
   background: var(--shelf);
   font-size: 14px; font-weight: 600;
 }
-.coach { grid-area: coach; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
-#coachLabel { flex: 0 0 100%; font-size: 14px; font-weight: 600; color: var(--muted); }
-.coach-btn {
-  flex: 1 1 0; min-width: 0; min-height: 52px; padding: 0 8px;
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  border: 3px solid var(--tone); border-radius: 16px;
-  background: var(--shelf); color: var(--tone);
-  font: 800 20px/1 var(--font-display);
-  transition: transform .08s ease;
-}
-.coach-btn:active { transform: scale(.97); }
-.coach-true { --tone: var(--true-text); --fill: var(--true); }
-.coach-false { --tone: var(--false-text); --fill: var(--false); }
-.coach-song { --tone: var(--ink); --fill: var(--ink); flex-grow: 1.35; font-size: 18px; }
-.coach-btn[aria-pressed="true"] { background: var(--fill); border-color: var(--fill); color: var(--on-pad); }
+.chip-strong { border-color: var(--ink); background: var(--ink); color: var(--shelf); }
 
-.prompt { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 46px; }
+.prompt { display: flex; align-items: center; gap: 12px; min-height: 46px; }
 #status { margin: 0; font-size: 16px; font-weight: 500; min-width: 0; text-wrap: balance; }
-.replay {
-  flex: none; min-height: 44px; padding: 0 14px;
-  display: inline-flex; align-items: center; gap: 6px;
-  border: 0; border-radius: 999px;
-  background: var(--ink); color: var(--ground);
-  font-size: 14px; font-weight: 600;
-}
 
 /* Hai nút loa */
 .stage { position: relative; min-height: 250px; }
@@ -165,8 +138,6 @@ button { cursor: pointer; }
   from { transform: translate(-50%, -50%) scale(.5); opacity: .75; }
   to { transform: translate(-50%, -50%) scale(3.4); opacity: 0; }
 }
-.pad.hint { outline: 10px solid var(--sun); outline-offset: -10px; animation: nudge 1.15s ease-in-out infinite; }
-@keyframes nudge { 50% { transform: scale(1.012); } }
 
 /* Phần thưởng */
 .stage.rewarding .pads { visibility: hidden; }
@@ -184,6 +155,7 @@ button { cursor: pointer; }
   animation: pop .45s cubic-bezier(.2, 1.6, .4, 1);
 }
 @keyframes pop { from { transform: scale(.7); } to { transform: scale(1); } }
+#rewardPraise { position: relative; margin: 0; font: 700 clamp(22px, min(6vw, 4.5vh), 40px)/1.15 var(--font-display); text-wrap: balance; }
 #rewardSong { position: relative; margin: 0; max-width: 34ch; font-size: 17px; font-weight: 600; overflow-wrap: anywhere; }
 .progress { position: relative; width: min(420px, 80%); height: 10px; border-radius: 999px; background: color-mix(in srgb, var(--sun-ink) 20%, transparent); overflow: hidden; }
 .progress i { display: block; height: 100%; background: var(--sun-ink); transform: scaleX(0); transform-origin: left; }
@@ -203,6 +175,7 @@ button { cursor: pointer; }
 .yt-host iframe, #ytPlayer { display: block; width: 100%; height: 100%; border: 0; }
 .reward.with-video { justify-content: flex-start; overflow-y: auto; }
 .reward.with-video h2 { font-size: clamp(28px, min(9vw, 6vh), 60px); }
+.reward.with-video #rewardPraise { font-size: clamp(18px, min(5vw, 3.5vh), 28px); }
 .reward.with-video .note { display: none; }
 @media (max-aspect-ratio: 1/1) {
   .reward.with-video .reward-body { margin-top: auto; }
@@ -308,19 +281,13 @@ button { cursor: pointer; }
 .check input { flex: none; width: 24px; height: 24px; margin: 0; accent-color: var(--true); }
 .steps { margin: 0; padding-left: 22px; display: grid; gap: 6px; font-size: 15px; }
 
-@media (max-width: 359px) {
-  .coach-btn .icon { display: none; }
-  .coach-song { font-size: 17px; }
-}
-/* Máy rộng: gộp kệ thành một hàng */
-@media (min-width: 640px) {
-  .shelf { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "brand coach chip"; }
-  .coach { flex-wrap: nowrap; max-width: 620px; margin-inline: auto; width: 100%; }
-  #coachLabel { flex: 0 1 auto; max-width: 128px; line-height: 1.2; }
-}
-@media (min-width: 640px) and (max-width: 899px) {
+/* Điện thoại hẹp: rút gọn chữ trên kệ */
+@media (max-width: 479px) {
   .chip-more { display: none; }
-  #coachLabel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+}
+@media (max-width: 359px) {
+  .chip .icon { display: none; }
+  .brand { font-size: 28px; }
 }
 /* Màn hình ngang hoặc tablet ngang: hai nút đứng cạnh nhau */
 @media (min-aspect-ratio: 1/1) {
@@ -336,15 +303,13 @@ button { cursor: pointer; }
 }
 @media (max-height: 460px) {
   .app { padding-block: 6px 10px; gap: 4px; }
-  .coach-btn { min-height: 44px; font-size: 18px; }
   .prompt { min-height: 36px; }
   #status { font-size: 14px; }
-  .replay { min-height: 36px; }
   .reward { padding: 8px 12px; gap: 6px; }
   .stop { min-height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pad.hint, .reward h2 { animation: none; }
+  .reward h2 { animation: none; }
   .note { display: none; }
   .pad.sounding::before, .pad.sounding::after { animation: none; transform: translate(-50%, -50%) scale(1.8); opacity: .5; }
   .pad.sounding::after { display: none; }
@@ -362,29 +327,19 @@ button { cursor: pointer; }
 <div class="app">
   <header class="shelf">
     <div class="brand">Dora</div>
-    <button id="openSheet" class="chip" type="button">
-      <svg class="icon" aria-hidden="true"><use href="#i-note"/></svg>
-      <span>Bài hát<span class="chip-more"> và âm thanh</span></span>
-    </button>
-    <div class="coach" role="group" aria-labelledby="coachLabel">
-      <span id="coachLabel">Người chơi cùng bấm đáp án đúng</span>
-      <button id="coachTrue" class="coach-btn coach-true" type="button" aria-pressed="false">
-        <svg class="icon" aria-hidden="true"><use href="#i-sound"/></svg><span data-word="true">True</span>
-      </button>
-      <button id="coachFalse" class="coach-btn coach-false" type="button" aria-pressed="false">
-        <svg class="icon" aria-hidden="true"><use href="#i-sound"/></svg><span data-word="false">False</span>
-      </button>
-      <button id="coachSong" class="coach-btn coach-song" type="button">
+    <div class="shelf-actions">
+      <button id="coachSong" class="chip chip-strong" type="button">
         <svg class="icon" aria-hidden="true"><use href="#i-note"/></svg><span>Phát nhạc</span>
+      </button>
+      <button id="openSheet" class="chip" type="button">
+        <svg class="icon" aria-hidden="true"><use href="#i-sound"/></svg>
+        <span>Bài hát<span class="chip-more"> và âm thanh</span></span>
       </button>
     </div>
   </header>
 
   <div class="prompt">
     <p id="status" role="status"></p>
-    <button id="replay" class="replay" type="button" hidden>
-      <svg class="icon" aria-hidden="true"><use href="#i-sound"/></svg>Nghe lại
-    </button>
   </div>
 
   <main id="stage" class="stage">
@@ -408,7 +363,8 @@ button { cursor: pointer; }
       <svg class="note" style="--x:78%;--d:.3s" aria-hidden="true"><use href="#i-note"/></svg>
       <svg class="note" style="--x:90%;--d:2.8s" aria-hidden="true"><use href="#i-note"/></svg>
       <div class="reward-body">
-        <h2 id="rewardTitle">Đúng rồi, Dora!</h2>
+        <h2 id="rewardTitle">It's true!</h2>
+        <p id="rewardPraise"></p>
         <p id="rewardSong"></p>
         <div id="rewardProgress" class="progress" aria-hidden="true"><i id="rewardBar"></i></div>
         <div class="reward-actions">
@@ -440,7 +396,7 @@ button { cursor: pointer; }
           <svg class="icon" aria-hidden="true"><use href="#i-note"/></svg>Thêm bài hát từ máy
         </label>
       </div>
-      <p class="help">Chọn file nhạc như mp3 hoặc m4a, mỗi file tối đa 15 MB và 10 phút. Có thể chọn nhiều bài cùng lúc. Khi Dora chọn đúng, file nhạc được ưu tiên tự phát.</p>
+      <p class="help">Chọn file nhạc như mp3 hoặc m4a, mỗi file tối đa 15 MB và 10 phút. Có thể chọn nhiều bài cùng lúc. Khi bấm True, file nhạc được ưu tiên tự phát.</p>
       <form id="ytForm" class="link-form">
         <div class="field">
           <label for="ytUrl">Hoặc dán link bài hát trên YouTube</label>
@@ -451,14 +407,14 @@ button { cursor: pointer; }
           <input id="ytName" class="text-input" type="text" maxlength="80" autocomplete="off" placeholder="Ví dụ: Bài hát tiếng Anh Dora thích">
         </div>
         <button id="ytAdd" class="ghost" type="submit">Thêm link YouTube</button>
-        <p id="ytHelp" class="help">Bài YouTube không tự phát được trong trò chơi. Khi Dora chọn đúng, trang tự phát nhạc có sẵn hoặc file nhạc, kèm nút để người chơi cùng mở bài YouTube.</p>
+        <p id="ytHelp" class="help">Bài YouTube không tự phát được trong trò chơi. Khi bấm True, trang tự phát nhạc có sẵn hoặc file nhạc, kèm nút để người chơi cùng mở bài YouTube.</p>
       </form>
       <p id="sheetMsg" role="status" hidden></p>
       <ul id="songList" class="songs"></ul>
     </section>
 
     <section>
-      <h3>Khi Dora chọn đúng</h3>
+      <h3>Sau khi bấm True</h3>
       <div class="field">
         <label for="rewardPick">Phát bài</label>
         <select id="rewardPick"></select>
@@ -476,19 +432,15 @@ button { cursor: pointer; }
     <section>
       <h3>Tiếng của hai nút</h3>
       <fieldset class="field">
-        <legend>Sau tiếng chuông, máy đọc</legend>
+        <legend>Máy đọc</legend>
         <div class="seg">
-          <input class="vh" type="radio" name="voice" id="voiceEn" value="en"><label for="voiceEn">True, False</label>
-          <input class="vh" type="radio" name="voice" id="voiceVi" value="vi"><label for="voiceVi">Đúng, Sai</label>
+          <input class="vh" type="radio" name="voice" id="voiceEn" value="en"><label for="voiceEn">It's true, It's false</label>
+          <input class="vh" type="radio" name="voice" id="voiceVi" value="vi"><label for="voiceVi">Đúng rồi, Sai rồi</label>
           <input class="vh" type="radio" name="voice" id="voiceNone" value="none"><label for="voiceNone">Không đọc</label>
         </div>
       </fieldset>
-      <p class="help">Lời khen dùng cùng ngôn ngữ với lựa chọn này. Khi chọn Không đọc, lời khen bằng tiếng Anh chỉ hiện trên màn hình.</p>
+      <p class="help">Lời khen dùng cùng ngôn ngữ với lựa chọn này. Khi chọn Không đọc, chữ vẫn hiện trên màn hình bằng tiếng Anh.</p>
       <p id="voiceNote" class="help" hidden></p>
-      <label class="check" for="hintToggle">
-        <input id="hintToggle" type="checkbox">
-        <span>Nút đúng nhấp nháy ngay từ đầu. Khi tắt, nút đúng chỉ nhấp nháy sau khi Dora chọn nhầm.</span>
-      </label>
       <p class="help">Không nghe tiếng? Hãy tăng âm lượng. Trên iPhone và iPad, tắt chế độ im lặng rồi thử lại.</p>
     </section>
 
@@ -496,8 +448,8 @@ button { cursor: pointer; }
       <h3>Cách chơi</h3>
       <ol class="steps">
         <li>Hỏi Dora một câu, ví dụ: “Đây là con mèo phải không?”</li>
-        <li>Bấm đáp án đúng ở kệ phía trên để Dora nghe tiếng của đáp án đó.</li>
-        <li>Dora bấm một nút to. Chọn đúng thì có pháo giấy, lời khen rồi nhạc tự phát. Chọn nhầm thì Dora nghe lại và chọn lại.</li>
+        <li>Bấm True: máy reo “It's true!”, có pháo giấy và lời khen, rồi tự phát một bài hát Dora thích.</li>
+        <li>Bấm False: máy đọc nhẹ nhàng “It's false.”, không phát nhạc.</li>
       </ol>
     </section>
   </div>
@@ -519,27 +471,25 @@ button { cursor: pointer; }
   // Khung claude.ai không cho nhúng YouTube; chạy ở địa chỉ riêng thì phát được ngay trong trang.
   const CAN_EMBED = !(window.claude && typeof window.claude.use === 'function');
   const COPY = {
-    idle: 'Hỏi Dora một câu, rồi bấm đáp án đúng ở trên.',
-    asking: 'Dora ơi, nghe rồi chọn nào!',
-    retry: 'Nghe lại nhé, rồi chọn lại nào.',
+    idle: 'Hỏi Dora một câu, rồi bấm True hoặc False.',
     reward: 'Đang phát nhạc cho Dora.',
     next: 'Giỏi lắm! Hỏi Dora câu tiếp theo nhé.'
   };
   const WORDS = {
-    en: { true: 'True', false: 'False', lang: 'en-US' },
-    vi: { true: 'Đúng', false: 'Sai', lang: 'vi-VN' }
+    en: { true: 'True', false: 'False', yes: 'It\'s true!', no: 'It\'s false.', lang: 'en-US' },
+    vi: { true: 'Đúng', false: 'Sai', yes: 'Đúng rồi!', no: 'Sai rồi.', lang: 'vi-VN' }
   };
   const PRAISE = {
     en: ['Good job, Dora!', 'Well done, Dora!', 'Great job!', 'You did it!', 'Awesome!', 'Excellent!',
       'Super, Dora!', 'Wonderful!', 'Way to go, Dora!', 'Fantastic!', 'Amazing, Dora!', 'Bravo!',
-      'Hooray for Dora!', 'That\'s right!', 'You are so smart!', 'High five, Dora!'],
-    vi: ['Đúng rồi, Dora!', 'Dora giỏi quá!', 'Giỏi lắm, Dora!', 'Tuyệt vời!', 'Hoan hô Dora!', 'Con làm tốt lắm!',
-      'Siêu quá, Dora!', 'Dora thông minh quá!', 'Đúng rồi, giỏi quá!', 'Cừ lắm, Dora!', 'Tuyệt quá, Dora!', 'Dora làm được rồi!']
+      'Hooray for Dora!', 'Yay, Dora!', 'You are so smart!', 'High five, Dora!'],
+    vi: ['Con giỏi quá!', 'Dora giỏi quá!', 'Giỏi lắm, Dora!', 'Tuyệt vời!', 'Hoan hô Dora!', 'Con làm tốt lắm!',
+      'Siêu quá, Dora!', 'Dora thông minh quá!', 'Tuyệt cú mèo!', 'Cừ lắm, Dora!', 'Tuyệt quá, Dora!', 'Dora làm được rồi!']
   };
 
   /* ---------- Cài đặt: mỗi máy tự nhớ ---------- */
   const SETTINGS_KEY = 'dora-true-false-settings';
-  const settings = { voice: 'en', hint: true, clip: 30, reward: 'random' };
+  const settings = { voice: 'en', clip: 30, reward: 'random' };
   try { Object.assign(settings, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}')); } catch (e) { /* dùng mặc định */ }
   function saveSettings() {
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) { /* không bắt buộc */ }
@@ -580,6 +530,9 @@ button { cursor: pointer; }
     }
     requestWakeLock();
     renderVoiceNote();
+    // Chuẩn bị sẵn bài kế tiếp để sau lời khen nhạc phát ngay.
+    if (CAN_EMBED) loadYouTubeApi().catch(() => {});
+    setTimeout(prepareReward, 1500);
   }
 
   async function requestWakeLock() {
@@ -757,17 +710,25 @@ button { cursor: pointer; }
     return { known: voices.length > 0, voice: match || null };
   }
 
+  // Giọng đọc của máy không có cảm xúc thật; cao độ và tốc độ được chỉnh để nghe phấn khởi hoặc nhẹ nhàng hơn.
+  const TONES = {
+    plain: { rate: 0.85, pitch: 1.1 },
+    excited: { rate: 1.05, pitch: 1.55 },
+    praise: { rate: 1, pitch: 1.3 },
+    calm: { rate: 0.85, pitch: 0.95 }
+  };
   let utterance = null;
-  function speak(text, lang) {
+  function speak(text, lang, tone) {
     return new Promise((resolve) => {
       if (!('speechSynthesis' in window)) { resolve(); return; }
       const found = findVoice(lang);
       if (found.known && !found.voice) { resolve(); return; }
+      const style = TONES[tone] || TONES.plain;
       utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
       if (found.voice) utterance.voice = found.voice;
-      utterance.rate = 0.85;
-      utterance.pitch = 1.1;
+      utterance.rate = style.rate;
+      utterance.pitch = style.pitch;
       const guard = setTimeout(resolve, Math.max(3000, text.length * 150));
       const finish = () => { clearTimeout(guard); resolve(); };
       utterance.onend = finish;
@@ -778,25 +739,23 @@ button { cursor: pointer; }
 
   /* ---------- Lượt chơi ---------- */
   const PADS = { true: $('padTrue'), false: $('padFalse') };
-  const COACH = { true: $('coachTrue'), false: $('coachFalse') };
   let mode = 'idle';
-  let target = null;
   let seq = 0;
   let previewId = null;
 
   function setMode(next, message) {
     mode = next;
     $('status').textContent = message || COPY[next];
-    $('replay').hidden = !(next === 'asking' || next === 'retry');
     $('reward').hidden = next !== 'reward';
     $('stage').classList.toggle('rewarding', next === 'reward');
-    COACH.true.setAttribute('aria-pressed', String(target === 'true'));
-    COACH.false.setAttribute('aria-pressed', String(target === 'false'));
   }
 
   function clearPads() {
-    Object.values(PADS).forEach((pad) => pad.classList.remove('sounding', 'hint'));
+    Object.values(PADS).forEach((pad) => pad.classList.remove('sounding'));
   }
+
+  // Chữ và giọng theo cài đặt; khi chọn không đọc thì vẫn hiện chữ tiếng Anh.
+  const wordsNow = () => WORDS[settings.voice] || WORDS.en;
 
   function cancelAll() {
     seq++;
@@ -809,60 +768,32 @@ button { cursor: pointer; }
     if (previewId) { const id = previewId; previewId = null; markPreview(id, false); }
   }
 
-  // Tiếng của một nút: chuông rồi đến lời đọc.
-  async function sign(kind, showRings) {
-    const my = seq;
-    if (showRings) PADS[kind].classList.add('sounding');
-    await playBuffer(sound(kind));
-    if (my !== seq) return false;
-    if (settings.voice !== 'none') {
-      const words = WORDS[settings.voice];
-      await speak(words[kind], words.lang);
-      if (my !== seq) return false;
-    }
-    PADS[kind].classList.remove('sounding');
-    return true;
-  }
-
-  async function ask(kind) {
-    unlock();
-    cancelAll();
-    target = kind;
-    setMode('asking');
-    setTimeout(prepareReward, 1400);
-    const my = seq;
-    const finished = await sign(kind, settings.hint);
-    if (finished && my === seq && settings.hint) PADS[kind].classList.add('hint');
-  }
-
+  // Bấm True là thưởng ngay; bấm False chỉ đọc nhẹ nhàng.
   let lastTap = { kind: null, at: 0 };
-  async function tapPad(kind) {
+  function tapPad(kind) {
     unlock();
     const now = Date.now();
-    if (lastTap.kind === kind && now - lastTap.at < 350) return;
+    if (lastTap.kind === kind && now - lastTap.at < 600) return;
     lastTap = { kind, at: now };
     if (mode === 'reward') return;
-    if (mode === 'idle') {
-      cancelAll();
-      sign(kind, true);
-      return;
-    }
-    if (kind === target) {
-      playReward(false);
-      return;
-    }
-    // Chọn nhầm: nghe tiếng nút vừa bấm, rồi nghe lại đáp án và thấy nút đúng nhấp nháy.
+    if (kind === 'true') playReward(false);
+    else sayFalse();
+  }
+
+  // False: tiếng gỗ trầm rồi đọc nhẹ nhàng, không khen và không phát nhạc.
+  async function sayFalse() {
     cancelAll();
     const my = seq;
-    setMode('retry');
-    PADS[kind].classList.add('sounding');
-    await playBuffer(sound(kind));
+    const words = wordsNow();
+    setMode('idle', words.no);
+    PADS.false.classList.add('sounding');
+    await playBuffer(sound('false'));
     if (my !== seq) return;
-    PADS[kind].classList.remove('sounding');
-    await wait(220);
-    if (my !== seq) return;
-    const finished = await sign(target, true);
-    if (finished && my === seq) PADS[target].classList.add('hint');
+    if (settings.voice !== 'none') {
+      await speak(words.no, words.lang, 'calm');
+      if (my !== seq) return;
+    }
+    PADS.false.classList.remove('sounding');
   }
 
   // Xáo cả bộ lời khen rồi rút dần: dùng hết một lượt mới lặp, và không lặp ngay lời vừa nói.
@@ -1083,21 +1014,25 @@ button { cursor: pointer; }
     unlock();
     cancelAll();
     const my = seq;
-    target = null;
+    const words = wordsNow();
     const praise = direct ? '' : nextPraise();
-    $('rewardTitle').textContent = praise || 'Nhạc của Dora';
+    $('rewardTitle').textContent = direct ? 'Nhạc của Dora' : words.yes;
+    $('rewardPraise').textContent = praise;
+    $('rewardPraise').hidden = !praise;
     $('rewardSong').textContent = '';
     $('rewardBar').style.transform = 'scaleX(0)';
     $('rewardLink').hidden = true;
-    setMode('reward', praise);
+    setMode('reward', direct ? '' : words.yes + ' ' + praise);
     if (!direct) {
       launchConfetti();
-      // Lời khen chen vào đoạn cuối của tiếng nhạc mừng để Dora không phải chờ lâu.
+      // Reo "It's true!" ngay trên nền nhạc mừng, khen tiếp, rồi mới phát bài hát.
       const fanfare = playBuffer(sound('fanfare'));
-      await wait(850);
+      await wait(400);
       if (my !== seq) return;
       if (settings.voice !== 'none') {
-        await speak(praise, WORDS[settings.voice].lang);
+        await speak(words.yes, words.lang, 'excited');
+        if (my !== seq) return;
+        await speak(praise, words.lang, 'praise');
         if (my !== seq) return;
       }
       await fanfare;
@@ -1109,7 +1044,7 @@ button { cursor: pointer; }
       const played = await playOnYouTube(pick.link, direct ? Infinity : (settings.clip || Infinity), my);
       if (my !== seq) return;
       if (played) {
-        setMode('idle', direct ? COPY.idle : COPY.next);
+        setMode('idle', direct ? COPY.idle : COPY.next); setTimeout(prepareReward, 300);
         return;
       }
     }
@@ -1134,7 +1069,7 @@ button { cursor: pointer; }
     trackProgress(my);
     await done;
     if (my !== seq) return;
-    setMode('idle', direct ? COPY.idle : COPY.next);
+    setMode('idle', direct ? COPY.idle : COPY.next); setTimeout(prepareReward, 300);
   }
 
   /* ---------- Kho bài hát ---------- */
@@ -1663,7 +1598,6 @@ button { cursor: pointer; }
   }
 
   function syncForm() {
-    $('hintToggle').checked = !!settings.hint;
     const clip = document.querySelector('input[name="clip"][value="' + Number(settings.clip) + '"]');
     if (clip) clip.checked = true;
     const voice = document.querySelector('input[name="voice"][value="' + (WORDS[settings.voice] || settings.voice === 'none' ? settings.voice : 'en') + '"]');
@@ -1743,10 +1677,7 @@ button { cursor: pointer; }
     pad.addEventListener('contextmenu', (event) => event.preventDefault());
   });
 
-  COACH.true.addEventListener('click', () => ask('true'));
-  COACH.false.addEventListener('click', () => ask('false'));
   $('coachSong').addEventListener('click', () => playReward(true));
-  $('replay').addEventListener('click', () => { if (target) ask(target); });
   $('stopBtn').addEventListener('click', () => { cancelAll(); setMode('idle'); });
 
   const sheet = $('sheet');
@@ -1804,7 +1735,6 @@ button { cursor: pointer; }
       renderVoiceNote();
     });
   });
-  $('hintToggle').addEventListener('change', (event) => { settings.hint = event.target.checked; saveSettings(); });
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
