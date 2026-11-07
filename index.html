@@ -1,0 +1,1834 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body><title>True False của Dora</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;600&display=swap">
+<style>
+/* Bố cục: một món đồ chơi có hai nút loa thật to; người chơi cùng có một kệ điều khiển mảnh phía trên. */
+:root {
+  --ground: #DCF0FA;
+  --shelf: #FFFFFF;
+  --ink: #12304F;
+  --muted: #47637E;
+  --line: #B5D7EA;
+  --true: #008F72;
+  --true-edge: #00624E;
+  --true-text: #007560;
+  --false: #DE4A26;
+  --false-edge: #A02E13;
+  --false-text: #BC3817;
+  --on-pad: #FFFFFF;
+  --sun: #FFC52E;
+  --sun-ink: #38290A;
+  --party-blue: #2F80ED;
+  --party-pink: #E8479B;
+  --font-display: "Baloo 2", ui-rounded, "Segoe UI", system-ui, sans-serif;
+  --font-body: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #10243B;
+    --shelf: #1B3552;
+    --ink: #EAF4FB;
+    --muted: #A9C2D8;
+    --line: #34557A;
+    --true-text: #4BDDBD;
+    --false-text: #FFA388;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #10243B;
+  --shelf: #1B3552;
+  --ink: #EAF4FB;
+  --muted: #A9C2D8;
+  --line: #34557A;
+  --true-text: #4BDDBD;
+  --false-text: #FFA388;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+button, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.vh {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; opacity: 0;
+}
+.sprite { position: absolute; width: 0; height: 0; }
+.icon { width: 1.1em; height: 1.1em; flex: none; }
+
+.app {
+  height: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-block: 12px 18px;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 8px;
+}
+
+/* Kệ của người chơi cùng */
+.shelf {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "brand chip" "coach coach";
+  gap: 8px 12px;
+  align-items: center;
+}
+.brand { grid-area: brand; font: 800 32px/1 var(--font-display); letter-spacing: .01em; }
+.chip {
+  grid-area: chip;
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 14px;
+  border: 2px solid var(--line); border-radius: 999px;
+  background: var(--shelf);
+  font-size: 14px; font-weight: 600;
+}
+.coach { grid-area: coach; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+#coachLabel { flex: 0 0 100%; font-size: 14px; font-weight: 600; color: var(--muted); }
+.coach-btn {
+  flex: 1 1 0; min-width: 0; min-height: 52px; padding: 0 8px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border: 3px solid var(--tone); border-radius: 16px;
+  background: var(--shelf); color: var(--tone);
+  font: 800 20px/1 var(--font-display);
+  transition: transform .08s ease;
+}
+.coach-btn:active { transform: scale(.97); }
+.coach-true { --tone: var(--true-text); --fill: var(--true); }
+.coach-false { --tone: var(--false-text); --fill: var(--false); }
+.coach-song { --tone: var(--ink); --fill: var(--ink); flex-grow: 1.35; font-size: 18px; }
+.coach-btn[aria-pressed="true"] { background: var(--fill); border-color: var(--fill); color: var(--on-pad); }
+
+.prompt { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 46px; }
+#status { margin: 0; font-size: 16px; font-weight: 500; min-width: 0; text-wrap: balance; }
+.replay {
+  flex: none; min-height: 44px; padding: 0 14px;
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 0; border-radius: 999px;
+  background: var(--ink); color: var(--ground);
+  font-size: 14px; font-weight: 600;
+}
+
+/* Hai nút loa */
+.stage { position: relative; min-height: 250px; }
+.pads { height: 100%; display: grid; grid-template-rows: 1fr 1fr; gap: 20px; padding-bottom: 10px; }
+.pad {
+  --edge: var(--true-edge);
+  position: relative; overflow: hidden; min-width: 0; min-height: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: clamp(2px, 1vh, 12px); padding: 8px;
+  border: 0; border-radius: clamp(28px, 6vmin, 52px);
+  background-color: var(--pad);
+  background-image: radial-gradient(color-mix(in srgb, var(--on-pad) 14%, transparent) 2.5px, transparent 3px);
+  background-size: 20px 20px;
+  color: var(--on-pad);
+  box-shadow: 0 10px 0 var(--edge);
+  transition: transform .07s ease, box-shadow .07s ease;
+}
+.pad-true { --pad: var(--true); --edge: var(--true-edge); }
+.pad-false { --pad: var(--false); --edge: var(--false-edge); }
+.pad:active { transform: translateY(7px); box-shadow: 0 3px 0 var(--edge); }
+.pad-icon { position: relative; z-index: 1; width: clamp(64px, min(26vw, 14vh), 170px); height: auto; }
+.pad-disc { fill: var(--on-pad); }
+.pad-mark { fill: none; stroke: var(--pad); stroke-width: 13; stroke-linecap: round; stroke-linejoin: round; }
+.pad-label { position: relative; z-index: 1; font: 800 clamp(40px, min(14vw, 8.5vh), 104px)/1.05 var(--font-display); }
+
+.pad.sounding::before, .pad.sounding::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 34%; aspect-ratio: 1; border-radius: 50%;
+  border: 7px solid var(--on-pad);
+  animation: ring 1.15s ease-out infinite;
+  pointer-events: none;
+}
+.pad.sounding::after { animation-delay: .38s; }
+@keyframes ring {
+  from { transform: translate(-50%, -50%) scale(.5); opacity: .75; }
+  to { transform: translate(-50%, -50%) scale(3.4); opacity: 0; }
+}
+.pad.hint { outline: 10px solid var(--sun); outline-offset: -10px; animation: nudge 1.15s ease-in-out infinite; }
+@keyframes nudge { 50% { transform: scale(1.012); } }
+
+/* Phần thưởng */
+.stage.rewarding .pads { visibility: hidden; }
+.reward {
+  position: absolute; inset: 0; z-index: 2; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; padding: 20px; text-align: center;
+  border-radius: clamp(28px, 6vmin, 52px);
+  background: var(--sun); color: var(--sun-ink);
+}
+.reward h2 {
+  position: relative; margin: 0;
+  font: 800 clamp(40px, min(12vw, 11vh), 96px)/1.05 var(--font-display);
+  text-wrap: balance;
+  animation: pop .45s cubic-bezier(.2, 1.6, .4, 1);
+}
+@keyframes pop { from { transform: scale(.7); } to { transform: scale(1); } }
+#rewardSong { position: relative; margin: 0; max-width: 34ch; font-size: 17px; font-weight: 600; overflow-wrap: anywhere; }
+.progress { position: relative; width: min(420px, 80%); height: 10px; border-radius: 999px; background: color-mix(in srgb, var(--sun-ink) 20%, transparent); overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--sun-ink); transform: scaleX(0); transform-origin: left; }
+.stop {
+  position: relative; min-height: 52px; padding: 0 26px;
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 0; border-radius: 999px;
+  background: var(--sun-ink); color: var(--sun);
+  font-weight: 600;
+}
+.stop-quiet { background: transparent; color: var(--sun-ink); border: 2px solid var(--sun-ink); }
+.reward-actions { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 100%; }
+.yt-link { padding: 6px 20px; font-size: 15px; justify-content: center; text-align: center; text-decoration: none; min-width: 0; overflow-wrap: anywhere; }
+#confetti { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+.reward-body { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; min-width: 0; }
+.yt-host { position: relative; flex: none; width: min(100%, 640px); min-width: 200px; min-height: 200px; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: var(--sun-ink); }
+.yt-host iframe, #ytPlayer { display: block; width: 100%; height: 100%; border: 0; }
+.reward.with-video { justify-content: flex-start; overflow-y: auto; }
+.reward.with-video h2 { font-size: clamp(28px, min(9vw, 6vh), 60px); }
+.reward.with-video .note { display: none; }
+@media (max-aspect-ratio: 1/1) {
+  .reward.with-video .reward-body { margin-top: auto; }
+  .reward.with-video .yt-host { margin-bottom: auto; }
+}
+@media (min-aspect-ratio: 1/1) {
+  .reward.with-video { flex-direction: row; justify-content: center; align-items: center; }
+  .reward.with-video .reward-body { flex: 1 1 40%; width: auto; }
+  .yt-host { width: min(56%, calc(62vh * 16 / 9)); }
+}
+.note { position: absolute; left: var(--x); bottom: -44px; width: 36px; height: 36px; color: var(--sun-ink); opacity: 0; animation: rise 3.4s linear infinite; animation-delay: var(--d); }
+@keyframes rise {
+  0% { transform: translateY(0) rotate(-8deg); opacity: 0; }
+  12% { opacity: .3; }
+  85% { opacity: .3; }
+  100% { transform: translateY(-115vh) rotate(10deg); opacity: 0; }
+}
+
+/* Tấm cài đặt */
+#sheet {
+  width: min(640px, 100%); max-width: 100%; max-height: 92%;
+  margin: auto auto 0; padding: 0;
+  border: 0; border-radius: 24px 24px 0 0;
+  background: var(--shelf); color: var(--ink);
+  overflow-y: auto; overscroll-behavior: contain;
+}
+#sheet::backdrop { background: rgba(8, 20, 35, .55); }
+.sheet-head {
+  position: sticky; top: 0; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px));
+  background: var(--shelf); border-bottom: 2px solid var(--line);
+}
+.sheet-head h2 { margin: 0; font: 800 24px/1.1 var(--font-display); }
+.sheet-body {
+  display: grid; gap: 26px;
+  padding-block: 18px calc(26px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.sheet-body section { display: grid; gap: 12px; min-width: 0; }
+.sheet-body h3 { margin: 0; font: 700 20px/1.15 var(--font-display); }
+.help { margin: 0; font-size: 14px; color: var(--muted); }
+.ghost {
+  min-height: 44px; padding: 0 16px;
+  border: 2px solid var(--line); border-radius: 999px;
+  background: transparent; font-size: 14px; font-weight: 600;
+}
+.add {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 56px; padding: 0 18px;
+  border-radius: 16px; background: var(--ink); color: var(--shelf);
+  font-weight: 600; cursor: pointer;
+}
+#fileInput:focus-visible + .add { outline: 3px solid var(--ink); outline-offset: 3px; }
+.link-form { display: grid; gap: 10px; padding-top: 14px; border-top: 1px solid var(--line); }
+.text-input {
+  width: 100%; min-height: 50px; padding: 0 12px;
+  border: 2px solid var(--line); border-radius: 14px;
+  background: var(--shelf); color: var(--ink); font: inherit; font-size: 16px;
+  -webkit-user-select: text; user-select: text;
+}
+#sheetMsg { margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--ground); font-size: 14px; overflow-wrap: anywhere; white-space: pre-line; }
+#sheetMsg.err { color: var(--false-text); font-weight: 600; }
+
+.songs {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; align-content: start;
+  max-height: min(56vh, 460px); overflow-y: auto;
+  border-bottom: 1px solid var(--line);
+}
+.song { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); min-width: 0; }
+.song-play {
+  flex: none; width: 46px; height: 46px;
+  display: grid; place-items: center;
+  border: 2px solid var(--line); border-radius: 50%; background: transparent;
+  color: inherit; text-decoration: none;
+}
+.song-play .icon { width: 22px; height: 22px; }
+.song-info { flex: 1 1 auto; min-width: 0; display: grid; }
+.song-name { font-weight: 600; overflow-wrap: anywhere; }
+.song-meta { font-size: 13px; color: var(--muted); }
+.song-actions { flex: none; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: 170px; }
+.song-del { min-height: 44px; padding: 0 12px; border: 0; border-radius: 12px; background: var(--ground); font-size: 14px; font-weight: 600; }
+.song-del.danger { background: var(--false); color: var(--on-pad); }
+
+.field { display: grid; gap: 6px; min-width: 0; border: 0; margin: 0; padding: 0; }
+.field > label, .field > legend { padding: 0; font-size: 14px; font-weight: 600; color: var(--muted); }
+#rewardPick {
+  width: 100%; min-height: 50px; padding: 0 12px;
+  border: 2px solid var(--line); border-radius: 14px; background: var(--shelf);
+}
+.seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg label {
+  flex: 1 1 0; min-width: min(100%, 92px); min-height: 48px; padding: 6px 10px;
+  display: grid; place-items: center; text-align: center;
+  border: 2px solid var(--line); border-radius: 14px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.seg input:checked + label { background: var(--ink); border-color: var(--ink); color: var(--shelf); }
+.seg input:focus-visible + label { outline: 3px solid var(--ink); outline-offset: 2px; }
+.check { display: flex; align-items: flex-start; gap: 10px; font-weight: 500; cursor: pointer; }
+.check input { flex: none; width: 24px; height: 24px; margin: 0; accent-color: var(--true); }
+.steps { margin: 0; padding-left: 22px; display: grid; gap: 6px; font-size: 15px; }
+
+@media (max-width: 359px) {
+  .coach-btn .icon { display: none; }
+  .coach-song { font-size: 17px; }
+}
+/* Máy rộng: gộp kệ thành một hàng */
+@media (min-width: 640px) {
+  .shelf { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "brand coach chip"; }
+  .coach { flex-wrap: nowrap; max-width: 620px; margin-inline: auto; width: 100%; }
+  #coachLabel { flex: 0 1 auto; max-width: 128px; line-height: 1.2; }
+}
+@media (min-width: 640px) and (max-width: 899px) {
+  .chip-more { display: none; }
+  #coachLabel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+}
+/* Màn hình ngang hoặc tablet ngang: hai nút đứng cạnh nhau */
+@media (min-aspect-ratio: 1/1) {
+  .pads { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+  .pad-icon { width: clamp(56px, min(15vw, 24vh), 220px); }
+  .pad-label { font-size: clamp(36px, min(8vw, 13vh), 124px); }
+  .stage { min-height: 150px; }
+}
+@media (min-width: 640px) and (min-height: 640px) {
+  #sheet { margin: auto; max-height: 86%; border-radius: 24px; }
+  .brand { font-size: 38px; }
+  #status { font-size: 19px; }
+}
+@media (max-height: 460px) {
+  .app { padding-block: 6px 10px; gap: 4px; }
+  .coach-btn { min-height: 44px; font-size: 18px; }
+  .prompt { min-height: 36px; }
+  #status { font-size: 14px; }
+  .replay { min-height: 36px; }
+  .reward { padding: 8px 12px; gap: 6px; }
+  .stop { min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pad.hint, .reward h2 { animation: none; }
+  .note { display: none; }
+  .pad.sounding::before, .pad.sounding::after { animation: none; transform: translate(-50%, -50%) scale(1.8); opacity: .5; }
+  .pad.sounding::after { display: none; }
+}
+</style>
+
+<svg class="sprite" aria-hidden="true">
+  <symbol id="i-note" viewBox="0 0 24 24"><path fill="currentColor" d="M9 18.5a3 3 0 1 1-2-2.83V5.6L19 3v12.5a3 3 0 1 1-2-2.83V7.5L9 9.2z"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><path fill="currentColor" d="M4 9.5v5h3.5L12 19V5L7.5 9.5z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.8 7.8 0 0 1 0 11"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.2v13.6L19.5 12z"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2" fill="currentColor"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M14 5h5v5M19 5l-8.5 8.5M17 14v4a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 5 18V8.5A1.5 1.5 0 0 1 6.5 7H10"/></symbol>
+</svg>
+
+<div class="app">
+  <header class="shelf">
+    <div class="brand">Dora</div>
+    <button id="openSheet" class="chip" type="button">
+      <svg class="icon" aria-hidden="true"><use href="#i-note"/></svg>
+      <span>Bài hát<span class="chip-more"> và âm thanh</span></span>
+    </button>
+    <div class="coach" role="group" aria-labelledby="coachLabel">
+      <span id="coachLabel">Người chơi cùng bấm đáp án đúng</span>
+      <button id="coachTrue" class="coach-btn coach-true" type="button" aria-pressed="false">
+        <svg class="icon" aria-hidden="true"><use href="#i-sound"/></svg><span data-word="true">True</span>
+      </button>
+      <button id="coachFalse" class="coach-btn coach-false" type="button" aria-pressed="false">
+        <svg class="icon" aria-hidden="true"><use href="#i-sound"/></svg><span data-word="false">False</span>
+      </button>
+      <button id="coachSong" class="coach-btn coach-song" type="button">
+        <svg class="icon" aria-hidden="true"><use href="#i-note"/></svg><span>Phát nhạc</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="prompt">
+    <p id="status" role="status"></p>
+    <button id="replay" class="replay" type="button" hidden>
+      <svg class="icon" aria-hidden="true"><use href="#i-sound"/></svg>Nghe lại
+    </button>
+  </div>
+
+  <main id="stage" class="stage">
+    <div class="pads">
+      <button id="padTrue" class="pad pad-true" type="button">
+        <svg class="pad-icon" viewBox="0 0 100 100" aria-hidden="true"><circle class="pad-disc" cx="50" cy="50" r="46"/><path class="pad-mark" d="M27 52 44 69 74 34"/></svg>
+        <span class="pad-label" data-word="true">True</span>
+      </button>
+      <button id="padFalse" class="pad pad-false" type="button">
+        <svg class="pad-icon" viewBox="0 0 100 100" aria-hidden="true"><circle class="pad-disc" cx="50" cy="50" r="46"/><path class="pad-mark" d="M33 33 67 67M67 33 33 67"/></svg>
+        <span class="pad-label" data-word="false">False</span>
+      </button>
+    </div>
+
+    <section id="reward" class="reward" hidden>
+      <svg class="note" style="--x:6%;--d:0s" aria-hidden="true"><use href="#i-note"/></svg>
+      <svg class="note" style="--x:20%;--d:1.3s" aria-hidden="true"><use href="#i-note"/></svg>
+      <svg class="note" style="--x:34%;--d:2.4s" aria-hidden="true"><use href="#i-note"/></svg>
+      <svg class="note" style="--x:50%;--d:.7s" aria-hidden="true"><use href="#i-note"/></svg>
+      <svg class="note" style="--x:64%;--d:1.9s" aria-hidden="true"><use href="#i-note"/></svg>
+      <svg class="note" style="--x:78%;--d:.3s" aria-hidden="true"><use href="#i-note"/></svg>
+      <svg class="note" style="--x:90%;--d:2.8s" aria-hidden="true"><use href="#i-note"/></svg>
+      <div class="reward-body">
+        <h2 id="rewardTitle">Đúng rồi, Dora!</h2>
+        <p id="rewardSong"></p>
+        <div id="rewardProgress" class="progress" aria-hidden="true"><i id="rewardBar"></i></div>
+        <div class="reward-actions">
+          <button id="stopBtn" class="stop" type="button">
+            <svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg>Dừng nhạc
+          </button>
+          <a id="rewardLink" class="stop stop-quiet yt-link" target="_blank" rel="noopener noreferrer" hidden>
+            <svg class="icon" aria-hidden="true"><use href="#i-open"/></svg><span id="rewardLinkText"></span>
+          </a>
+        </div>
+      </div>
+      <div id="ytHost" class="yt-host" hidden><div id="ytPlayer"></div></div>
+    </section>
+  </main>
+</div>
+
+<dialog id="sheet" aria-labelledby="sheetTitle">
+  <div class="sheet-head">
+    <h2 id="sheetTitle">Bài hát và âm thanh</h2>
+    <button id="closeSheet" class="ghost" type="button">Đóng</button>
+  </div>
+  <div class="sheet-body">
+    <section>
+      <h3>Bài hát Dora thích</h3>
+      <p id="whereNote" class="help"></p>
+      <div>
+        <input id="fileInput" class="vh" type="file" multiple accept="audio/*,video/mp4,.mp3,.m4a,.aac,.wav,.ogg,.oga,.opus,.flac,.mp4">
+        <label for="fileInput" class="add">
+          <svg class="icon" aria-hidden="true"><use href="#i-note"/></svg>Thêm bài hát từ máy
+        </label>
+      </div>
+      <p class="help">Chọn file nhạc như mp3 hoặc m4a, mỗi file tối đa 15 MB và 10 phút. Có thể chọn nhiều bài cùng lúc. Khi Dora chọn đúng, file nhạc được ưu tiên tự phát.</p>
+      <form id="ytForm" class="link-form">
+        <div class="field">
+          <label for="ytUrl">Hoặc dán link bài hát trên YouTube</label>
+          <input id="ytUrl" class="text-input" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="field">
+          <label for="ytName">Tên bài để dễ nhận ra</label>
+          <input id="ytName" class="text-input" type="text" maxlength="80" autocomplete="off" placeholder="Ví dụ: Bài hát tiếng Anh Dora thích">
+        </div>
+        <button id="ytAdd" class="ghost" type="submit">Thêm link YouTube</button>
+        <p id="ytHelp" class="help">Bài YouTube không tự phát được trong trò chơi. Khi Dora chọn đúng, trang tự phát nhạc có sẵn hoặc file nhạc, kèm nút để người chơi cùng mở bài YouTube.</p>
+      </form>
+      <p id="sheetMsg" role="status" hidden></p>
+      <ul id="songList" class="songs"></ul>
+    </section>
+
+    <section>
+      <h3>Khi Dora chọn đúng</h3>
+      <div class="field">
+        <label for="rewardPick">Phát bài</label>
+        <select id="rewardPick"></select>
+      </div>
+      <fieldset class="field">
+        <legend>Phát trong bao lâu</legend>
+        <div class="seg">
+          <input class="vh" type="radio" name="clip" id="clip15" value="15"><label for="clip15">15 giây</label>
+          <input class="vh" type="radio" name="clip" id="clip30" value="30"><label for="clip30">30 giây</label>
+          <input class="vh" type="radio" name="clip" id="clip0" value="0"><label for="clip0">Cả bài</label>
+        </div>
+      </fieldset>
+    </section>
+
+    <section>
+      <h3>Tiếng của hai nút</h3>
+      <fieldset class="field">
+        <legend>Sau tiếng chuông, máy đọc</legend>
+        <div class="seg">
+          <input class="vh" type="radio" name="voice" id="voiceEn" value="en"><label for="voiceEn">True, False</label>
+          <input class="vh" type="radio" name="voice" id="voiceVi" value="vi"><label for="voiceVi">Đúng, Sai</label>
+          <input class="vh" type="radio" name="voice" id="voiceNone" value="none"><label for="voiceNone">Không đọc</label>
+        </div>
+      </fieldset>
+      <p class="help">Lời khen dùng cùng ngôn ngữ với lựa chọn này. Khi chọn Không đọc, lời khen bằng tiếng Anh chỉ hiện trên màn hình.</p>
+      <p id="voiceNote" class="help" hidden></p>
+      <label class="check" for="hintToggle">
+        <input id="hintToggle" type="checkbox">
+        <span>Nút đúng nhấp nháy ngay từ đầu. Khi tắt, nút đúng chỉ nhấp nháy sau khi Dora chọn nhầm.</span>
+      </label>
+      <p class="help">Không nghe tiếng? Hãy tăng âm lượng. Trên iPhone và iPad, tắt chế độ im lặng rồi thử lại.</p>
+    </section>
+
+    <section>
+      <h3>Cách chơi</h3>
+      <ol class="steps">
+        <li>Hỏi Dora một câu, ví dụ: “Đây là con mèo phải không?”</li>
+        <li>Bấm đáp án đúng ở kệ phía trên để Dora nghe tiếng của đáp án đó.</li>
+        <li>Dora bấm một nút to. Chọn đúng thì có pháo giấy, lời khen rồi nhạc tự phát. Chọn nhầm thì Dora nghe lại và chọn lại.</li>
+      </ol>
+    </section>
+  </div>
+</dialog>
+
+<canvas id="confetti" aria-hidden="true" hidden></canvas>
+
+<script>
+(function () {
+  'use strict';
+
+  const $ = (id) => document.getElementById(id);
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const MAX_BYTES = 15 * 1024 * 1024;
+  const MAX_SECONDS = 10 * 60;
+  const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
+  const ASSET_ID = /^[0-9a-f]{32}$/;
+  // Khung claude.ai không cho nhúng YouTube; chạy ở địa chỉ riêng thì phát được ngay trong trang.
+  const CAN_EMBED = !(window.claude && typeof window.claude.use === 'function');
+  const COPY = {
+    idle: 'Hỏi Dora một câu, rồi bấm đáp án đúng ở trên.',
+    asking: 'Dora ơi, nghe rồi chọn nào!',
+    retry: 'Nghe lại nhé, rồi chọn lại nào.',
+    reward: 'Đang phát nhạc cho Dora.',
+    next: 'Giỏi lắm! Hỏi Dora câu tiếp theo nhé.'
+  };
+  const WORDS = {
+    en: { true: 'True', false: 'False', lang: 'en-US' },
+    vi: { true: 'Đúng', false: 'Sai', lang: 'vi-VN' }
+  };
+  const PRAISE = {
+    en: ['Good job, Dora!', 'Well done, Dora!', 'Great job!', 'You did it!', 'Awesome!', 'Excellent!',
+      'Super, Dora!', 'Wonderful!', 'Way to go, Dora!', 'Fantastic!', 'Amazing, Dora!', 'Bravo!',
+      'Hooray for Dora!', 'That\'s right!', 'You are so smart!', 'High five, Dora!'],
+    vi: ['Đúng rồi, Dora!', 'Dora giỏi quá!', 'Giỏi lắm, Dora!', 'Tuyệt vời!', 'Hoan hô Dora!', 'Con làm tốt lắm!',
+      'Siêu quá, Dora!', 'Dora thông minh quá!', 'Đúng rồi, giỏi quá!', 'Cừ lắm, Dora!', 'Tuyệt quá, Dora!', 'Dora làm được rồi!']
+  };
+
+  /* ---------- Cài đặt: mỗi máy tự nhớ ---------- */
+  const SETTINGS_KEY = 'dora-true-false-settings';
+  const settings = { voice: 'en', hint: true, clip: 30, reward: 'random' };
+  try { Object.assign(settings, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}')); } catch (e) { /* dùng mặc định */ }
+  function saveSettings() {
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) { /* không bắt buộc */ }
+  }
+
+  /* ---------- Âm thanh ---------- */
+  let ctx = null;
+  let master = null;
+  let current = null;
+  let armed = false;
+  let wakeLock = null;
+
+  function getCtx() {
+    if (!ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      ctx = new AudioCtx();
+      master = ctx.createGain();
+      master.connect(ctx.destination);
+    }
+    return ctx;
+  }
+
+  // Trình duyệt trên điện thoại chỉ mở âm thanh sau một lần chạm thật.
+  function unlock() {
+    const c = getCtx();
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* máy cũ */ }
+    if (c.state !== 'running') c.resume().catch(() => {});
+    if (armed) return;
+    armed = true;
+    const blip = c.createBufferSource();
+    blip.buffer = c.createBuffer(1, 1, c.sampleRate);
+    blip.connect(c.destination);
+    blip.start(0);
+    if ('speechSynthesis' in window) {
+      const silent = new SpeechSynthesisUtterance(' ');
+      silent.volume = 0;
+      speechSynthesis.speak(silent);
+    }
+    requestWakeLock();
+    renderVoiceNote();
+  }
+
+  async function requestWakeLock() {
+    try {
+      if (navigator.wakeLock && !wakeLock && !document.hidden) {
+        wakeLock = await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener('release', () => { wakeLock = null; });
+      }
+    } catch (e) { /* không có cũng chơi được */ }
+  }
+
+  const hz = (midi) => 440 * Math.pow(2, (midi - 69) / 12);
+  const TIMBRE = {
+    bell: [[1, 1, 3.2], [2, 0.45, 5.5], [3.01, 0.2, 8], [4.2, 0.08, 12]],
+    wood: [[1, 1, 3.8], [2, 0.38, 7], [3, 0.14, 11]],
+    soft: [[1, 1, 2.2], [2, 0.3, 4]]
+  };
+
+  function render(notes, seconds) {
+    const c = getCtx();
+    const rate = c.sampleRate;
+    const buffer = c.createBuffer(1, Math.ceil(seconds * rate), rate);
+    const out = buffer.getChannelData(0);
+    for (const n of notes) {
+      const from = Math.floor(n.t * rate);
+      const length = Math.min(out.length - from, Math.floor(n.d * rate));
+      const attack = n.a || 0.004;
+      const slide = n.s || 0;
+      const release = 0.02 * rate;
+      for (let i = 0; i < length; i++) {
+        const t = i / rate;
+        const envelope = Math.min(1, t / attack) * Math.min(1, (length - i) / release);
+        const phase = 2 * Math.PI * n.f * (t - slide * t * t / 2);
+        let sample = 0;
+        for (const part of TIMBRE[n.k]) sample += part[1] * Math.exp(-part[2] * t) * Math.sin(part[0] * phase);
+        out[from + i] += n.g * envelope * sample;
+      }
+    }
+    let peak = 0;
+    for (let i = 0; i < out.length; i++) peak = Math.max(peak, Math.abs(out[i]));
+    if (peak > 0) for (let i = 0; i < out.length; i++) out[i] *= 0.85 / peak;
+    return buffer;
+  }
+
+  const RECIPES = {
+    // True: chuông sáng đi lên. False: tiếng gỗ tròn, trầm hơn, đi xuống, không chói.
+    true: () => render([72, 76, 79, 84].map((m, i) => ({ t: i * 0.11, f: hz(m), d: 0.85, g: 1, k: 'bell' })), 1.2),
+    false: () => render([
+      { t: 0, f: hz(67), d: 0.45, g: 1, k: 'wood', a: 0.012, s: 0.12 },
+      { t: 0.27, f: hz(62), d: 0.7, g: 1, k: 'wood', a: 0.012, s: 0.12 }
+    ], 1),
+    fanfare: () => render(
+      [72, 76, 79, 84, 88].map((m, i) => ({ t: i * 0.09, f: hz(m), d: 0.7, g: 1, k: 'bell' }))
+        .concat([72, 79, 84, 88].map((m) => ({ t: 0.5, f: hz(m), d: 1, g: 0.55, k: 'bell' }))), 1.5),
+    melody: () => {
+      const beat = 0.46;
+      const tune = [[67, 1], [69, 0.5], [72, 0.5], [76, 1], [72, 1], [74, 1], [72, 0.5], [69, 0.5], [67, 2],
+        [69, 1], [72, 0.5], [74, 0.5], [76, 1], [79, 1], [76, 0.5], [74, 0.5], [72, 1], [72, 2]];
+      const roots = [60, 55, 53, 60];
+      const notes = [];
+      for (let round = 0; round < 2; round++) {
+        let t = round * 16 * beat;
+        for (const step of tune) {
+          notes.push({ t, f: hz(step[0]), d: step[1] * beat + 0.5, g: 0.9, k: 'bell' });
+          t += step[1] * beat;
+        }
+        roots.forEach((m, bar) => {
+          [0, 2].forEach((b) => notes.push({ t: (round * 16 + bar * 4 + b) * beat, f: hz(m), d: beat * 1.6, g: 0.4, k: 'soft', a: 0.01 }));
+        });
+      }
+      return render(notes, 32 * beat + 1);
+    }
+  };
+  // Giai điệu dân gian tự do bản quyền. Mỗi nốt là "cao độ MIDI-số phách", mặc định 1 phách.
+  const ROOT_NOTES = { C: 60, F: 53, G: 55 };
+  const TUNE_BOOK = {
+    bingo: {
+      name: 'BINGO', beat: 0.36, rootBeats: 2,
+      notes: '67 72 72 67 67 69 69 67 67 72 72 74 74 76 72-2 76 76 77-.5 77-.5 77 74 74 76-.5 76-.5 76 72 72 74-.5 74-.5 74 71 67-.5 69-.5 71 72-.5 72-.5 72-2',
+      roots: 'C C F C C G C C C F G C F G G C C'
+    },
+    twinkle: {
+      name: 'Twinkle Twinkle', beat: 0.42, rootBeats: 2,
+      notes: '72 72 79 79 81 81 79-2 77 77 76 76 74 74 72-2 79 79 77 77 76 76 74-2 79 79 77 77 76 76 74-2 72 72 79 79 81 81 79-2 77 77 76 76 74 74 72-2',
+      roots: 'C C F C F C G C C G C G C G C G C C F C F C G C'
+    },
+    mary: {
+      name: 'Mary Had a Little Lamb', beat: 0.42, rootBeats: 2,
+      notes: '76 74 72 74 76 76 76-2 74 74 74-2 76 79 79-2 76 74 72 74 76 76 76 76 74 74 76 74 72-4',
+      roots: 'C C C C G G C C C C C C G G C C'
+    },
+    oldmac: {
+      name: 'Old MacDonald', beat: 0.4, rootBeats: 2,
+      notes: '72 72 72 67 69 69 67-2 76 76 74 74 72-3 67 72 72 72 67 69 69 67-2 76 76 74 74 72-4',
+      roots: 'C C F C C G C C C C F C C G C C'
+    },
+    row: {
+      name: 'Row Row Row Your Boat', beat: 0.34, rootBeats: 3, repeats: 2,
+      notes: '72-1.5 72-1.5 72 74-.5 76-1.5 76 74-.5 76 77-.5 79-3 84-.5 84-.5 84-.5 79-.5 79-.5 79-.5 76-.5 76-.5 76-.5 72-.5 72-.5 72-.5 79 77-.5 76 74-.5 72-3',
+      roots: 'C C C C C C G C'
+    }
+  };
+  function parseNotes(text) {
+    return text.split(' ').map((token) => {
+      const parts = token.split('-');
+      return [Number(parts[0]), parts[1] ? Number(parts[1]) : 1];
+    });
+  }
+  function tuneSeconds(book) {
+    return parseNotes(book.notes).reduce((sum, n) => sum + n[1], 0) * (book.repeats || 1) * book.beat;
+  }
+  function renderTune(book) {
+    const melody = parseNotes(book.notes);
+    const total = melody.reduce((sum, n) => sum + n[1], 0);
+    const notes = [];
+    for (let round = 0; round < (book.repeats || 1); round++) {
+      let at = round * total;
+      for (const n of melody) {
+        notes.push({ t: at * book.beat, f: hz(n[0]), d: n[1] * book.beat + 0.45, g: 0.9, k: 'bell' });
+        at += n[1];
+      }
+      book.roots.split(' ').forEach((name, i) => {
+        notes.push({ t: (round * total + i * book.rootBeats) * book.beat, f: hz(ROOT_NOTES[name]), d: book.rootBeats * book.beat * 0.85, g: 0.38, k: 'soft', a: 0.01 });
+      });
+    }
+    return render(notes, tuneSeconds(book) + 1);
+  }
+  Object.keys(TUNE_BOOK).forEach((key) => { RECIPES[key] = () => renderTune(TUNE_BOOK[key]); });
+
+  const rendered = {};
+  const sound = (name) => rendered[name] || (rendered[name] = RECIPES[name]());
+
+  function stopSource() {
+    if (!current) return;
+    try { current.source.stop(); } catch (e) { /* đã dừng */ }
+    current = null;
+  }
+
+  function playBuffer(buffer, options) {
+    const opts = options || {};
+    const limit = opts.limit || Infinity;
+    const gain = opts.gain || 1;
+    const c = getCtx();
+    stopSource();
+    const source = c.createBufferSource();
+    source.buffer = buffer;
+    const volume = c.createGain();
+    source.connect(volume);
+    volume.connect(master);
+    const start = c.currentTime + 0.03;
+    const length = Math.min(buffer.duration, limit);
+    volume.gain.setValueAtTime(gain, start);
+    if (length < buffer.duration) {
+      volume.gain.setValueAtTime(gain, start + length - 1.5);
+      volume.gain.linearRampToValueAtTime(0, start + length);
+    }
+    const handle = { source, start, length };
+    current = handle;
+    const done = new Promise((resolve) => {
+      // Đồng hồ dự phòng: nếu máy treo âm thanh, lượt chơi vẫn đi tiếp.
+      const guard = setTimeout(resolve, (length + 0.8) * 1000);
+      source.onended = () => { clearTimeout(guard); if (current === handle) current = null; resolve(); };
+    });
+    source.start(start);
+    if (length < buffer.duration) source.stop(start + length);
+    return done;
+  }
+
+  function findVoice(lang) {
+    if (!('speechSynthesis' in window)) return { known: false, voice: null };
+    const voices = speechSynthesis.getVoices();
+    const wanted = lang.slice(0, 2).toLowerCase();
+    const match = voices.find((v) => v.lang.toLowerCase().replace('_', '-') === lang.toLowerCase())
+      || voices.find((v) => v.lang.toLowerCase().startsWith(wanted));
+    return { known: voices.length > 0, voice: match || null };
+  }
+
+  let utterance = null;
+  function speak(text, lang) {
+    return new Promise((resolve) => {
+      if (!('speechSynthesis' in window)) { resolve(); return; }
+      const found = findVoice(lang);
+      if (found.known && !found.voice) { resolve(); return; }
+      utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      if (found.voice) utterance.voice = found.voice;
+      utterance.rate = 0.85;
+      utterance.pitch = 1.1;
+      const guard = setTimeout(resolve, Math.max(3000, text.length * 150));
+      const finish = () => { clearTimeout(guard); resolve(); };
+      utterance.onend = finish;
+      utterance.onerror = finish;
+      speechSynthesis.speak(utterance);
+    });
+  }
+
+  /* ---------- Lượt chơi ---------- */
+  const PADS = { true: $('padTrue'), false: $('padFalse') };
+  const COACH = { true: $('coachTrue'), false: $('coachFalse') };
+  let mode = 'idle';
+  let target = null;
+  let seq = 0;
+  let previewId = null;
+
+  function setMode(next, message) {
+    mode = next;
+    $('status').textContent = message || COPY[next];
+    $('replay').hidden = !(next === 'asking' || next === 'retry');
+    $('reward').hidden = next !== 'reward';
+    $('stage').classList.toggle('rewarding', next === 'reward');
+    COACH.true.setAttribute('aria-pressed', String(target === 'true'));
+    COACH.false.setAttribute('aria-pressed', String(target === 'false'));
+  }
+
+  function clearPads() {
+    Object.values(PADS).forEach((pad) => pad.classList.remove('sounding', 'hint'));
+  }
+
+  function cancelAll() {
+    seq++;
+    stopSource();
+    if ('speechSynthesis' in window && (speechSynthesis.speaking || speechSynthesis.pending)) speechSynthesis.cancel();
+    clearPads();
+    stopConfetti();
+    finishYouTube(false);
+    hideYouTube();
+    if (previewId) { const id = previewId; previewId = null; markPreview(id, false); }
+  }
+
+  // Tiếng của một nút: chuông rồi đến lời đọc.
+  async function sign(kind, showRings) {
+    const my = seq;
+    if (showRings) PADS[kind].classList.add('sounding');
+    await playBuffer(sound(kind));
+    if (my !== seq) return false;
+    if (settings.voice !== 'none') {
+      const words = WORDS[settings.voice];
+      await speak(words[kind], words.lang);
+      if (my !== seq) return false;
+    }
+    PADS[kind].classList.remove('sounding');
+    return true;
+  }
+
+  async function ask(kind) {
+    unlock();
+    cancelAll();
+    target = kind;
+    setMode('asking');
+    setTimeout(prepareReward, 1400);
+    const my = seq;
+    const finished = await sign(kind, settings.hint);
+    if (finished && my === seq && settings.hint) PADS[kind].classList.add('hint');
+  }
+
+  let lastTap = { kind: null, at: 0 };
+  async function tapPad(kind) {
+    unlock();
+    const now = Date.now();
+    if (lastTap.kind === kind && now - lastTap.at < 350) return;
+    lastTap = { kind, at: now };
+    if (mode === 'reward') return;
+    if (mode === 'idle') {
+      cancelAll();
+      sign(kind, true);
+      return;
+    }
+    if (kind === target) {
+      playReward(false);
+      return;
+    }
+    // Chọn nhầm: nghe tiếng nút vừa bấm, rồi nghe lại đáp án và thấy nút đúng nhấp nháy.
+    cancelAll();
+    const my = seq;
+    setMode('retry');
+    PADS[kind].classList.add('sounding');
+    await playBuffer(sound(kind));
+    if (my !== seq) return;
+    PADS[kind].classList.remove('sounding');
+    await wait(220);
+    if (my !== seq) return;
+    const finished = await sign(target, true);
+    if (finished && my === seq) PADS[target].classList.add('hint');
+  }
+
+  // Xáo cả bộ lời khen rồi rút dần: dùng hết một lượt mới lặp, và không lặp ngay lời vừa nói.
+  const praiseBags = { en: [], vi: [] };
+  let lastPraise = '';
+  function shuffled(list) {
+    const out = list.slice();
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const held = out[i];
+      out[i] = out[j];
+      out[j] = held;
+    }
+    return out;
+  }
+  function nextPraise() {
+    const lang = settings.voice === 'vi' ? 'vi' : 'en';
+    if (!praiseBags[lang].length) {
+      const bag = shuffled(PRAISE[lang]);
+      if (bag[bag.length - 1] === lastPraise) {
+        bag[bag.length - 1] = bag[0];
+        bag[0] = lastPraise;
+      }
+      praiseBags[lang] = bag;
+    }
+    lastPraise = praiseBags[lang].pop();
+    return lastPraise;
+  }
+
+  /* ---------- YouTube ngay trong trò chơi (chỉ khi chạy ngoài claude.ai) ---------- */
+  let ytApi = null;
+  let ytPlayerReady = null;
+  let ytRun = null;
+
+  function loadYouTubeApi() {
+    if (ytApi) return ytApi;
+    ytApi = new Promise((resolve, reject) => {
+      if (window.YT && window.YT.Player) { resolve(window.YT); return; }
+      const guard = setTimeout(() => reject(new Error('youtube api timeout')), 8000);
+      window.onYouTubeIframeAPIReady = () => { clearTimeout(guard); resolve(window.YT); };
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      tag.onerror = () => { clearTimeout(guard); reject(new Error('youtube api failed')); };
+      document.head.appendChild(tag);
+    });
+    ytApi.catch(() => { ytApi = null; });
+    return ytApi;
+  }
+
+  function getYouTubePlayer() {
+    if (ytPlayerReady) return ytPlayerReady;
+    ytPlayerReady = loadYouTubeApi().then((YT) => new Promise((resolve, reject) => {
+      const guard = setTimeout(() => reject(new Error('youtube player timeout')), 10000);
+      // Dùng tên miền nocookie cho trẻ em: YouTube hạn chế theo dõi khi video được nhúng theo cách này.
+      new YT.Player('ytPlayer', {
+        host: 'https://www.youtube-nocookie.com',
+        width: '100%',
+        height: '100%',
+        playerVars: { playsinline: 1, rel: 0, fs: 0, origin: location.origin },
+        events: {
+          onReady: (event) => { clearTimeout(guard); resolve(event.target); },
+          onStateChange: (event) => youTubeStateChanged(event.data),
+          onError: () => finishYouTube(false)
+        }
+      });
+    }));
+    ytPlayerReady.catch(() => { ytPlayerReady = null; });
+    return ytPlayerReady;
+  }
+
+  function hideYouTube() {
+    $('ytHost').hidden = true;
+    $('reward').classList.remove('with-video');
+  }
+
+  function finishYouTube(played) {
+    const run = ytRun;
+    if (!run) return;
+    ytRun = null;
+    clearTimeout(run.hint);
+    clearInterval(run.tick);
+    try {
+      run.player.stopVideo();
+      run.player.setVolume(100);
+    } catch (e) { /* trình phát đã đóng */ }
+    hideYouTube();
+    run.resolve(played);
+  }
+
+  function youTubeStateChanged(state) {
+    const run = ytRun;
+    if (!run) return;
+    if (state === 0) { finishYouTube(true); return; }
+    if (state !== 1 || run.started) return;
+    run.started = true;
+    run.startedAt = performance.now();
+    clearTimeout(run.hint);
+    $('rewardSong').textContent = 'Đang phát: ' + run.song.name;
+    run.tick = setInterval(() => {
+      const elapsed = (performance.now() - run.startedAt) / 1000;
+      let share = 0;
+      if (run.limit < Infinity) {
+        share = elapsed / run.limit;
+        if (elapsed >= run.limit) { finishYouTube(true); return; }
+        // Giảm dần âm lượng ở 1,5 giây cuối để đoạn nhạc không tắt đột ngột.
+        if (run.limit - elapsed < 1.5) run.player.setVolume(Math.round(100 * (run.limit - elapsed) / 1.5));
+      } else {
+        const total = run.player.getDuration();
+        share = total ? run.player.getCurrentTime() / total : 0;
+      }
+      $('rewardBar').style.transform = 'scaleX(' + Math.min(1, share) + ')';
+    }, 200);
+  }
+
+  // Trả về true nếu đã phát xong, false nếu không phát được để trang chuyển sang nhạc có sẵn.
+  function playOnYouTube(song, limit, my) {
+    return new Promise((resolve) => {
+      $('ytHost').hidden = false;
+      $('reward').classList.add('with-video');
+      $('rewardSong').textContent = 'Đang mở: ' + song.name;
+      getYouTubePlayer().then((player) => {
+        if (my !== seq) { resolve(false); return; }
+        ytRun = { player, resolve, song, limit, started: false, startedAt: 0, tick: 0, hint: 0 };
+        // Một số máy chặn tự phát có tiếng: khi đó chỉ cần chạm vào video.
+        ytRun.hint = setTimeout(() => {
+          if (ytRun && !ytRun.started) $('rewardSong').textContent = 'Chạm vào video để phát: ' + song.name;
+        }, 3500);
+        player.unMute();
+        player.setVolume(100);
+        player.loadVideoById(song.youtube);
+      }).catch(() => {
+        hideYouTube();
+        resolve(false);
+      });
+    });
+  }
+
+  // Pháo giấy bắn từ hai góc dưới rồi rơi xuống trong khoảng 3 giây.
+  let confettiFrame = 0;
+  function stopConfetti() {
+    if (confettiFrame) cancelAnimationFrame(confettiFrame);
+    confettiFrame = 0;
+    $('confetti').hidden = true;
+  }
+  function launchConfetti() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const canvas = $('confetti');
+    const paint = canvas.getContext('2d');
+    if (!paint) return;
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    canvas.width = Math.round(width * ratio);
+    canvas.height = Math.round(height * ratio);
+    canvas.hidden = false;
+    paint.setTransform(ratio, 0, 0, ratio, 0, 0);
+    const style = getComputedStyle(document.documentElement);
+    const colors = ['--true', '--false', '--on-pad', '--party-blue', '--party-pink'].map((name) => style.getPropertyValue(name).trim());
+    const count = Math.max(90, Math.min(220, Math.round(width / 3)));
+    const pieces = [];
+    for (let i = 0; i < count; i++) {
+      const fromLeft = i % 2 === 0;
+      const angle = 0.25 + Math.random() * 0.6;
+      const speed = height * (1.1 + Math.random() * 1.1);
+      pieces.push({
+        x: fromLeft ? 0 : width,
+        y: height,
+        vx: Math.sin(angle) * speed * (fromLeft ? 1 : -1),
+        vy: -Math.cos(angle) * speed,
+        w: 6 + Math.random() * 7,
+        h: 4 + Math.random() * 6,
+        turn: Math.random() * Math.PI,
+        spin: (Math.random() - 0.5) * 12,
+        color: colors[i % colors.length]
+      });
+    }
+    const lifetime = 3000;
+    const began = performance.now();
+    let last = began;
+    const frame = (now) => {
+      const age = now - began;
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      paint.clearRect(0, 0, width, height);
+      paint.globalAlpha = age > lifetime - 700 ? Math.max(0, (lifetime - age) / 700) : 1;
+      const drag = Math.exp(-1.1 * dt);
+      for (const p of pieces) {
+        p.vx *= drag;
+        p.vy = p.vy * drag + height * 1.15 * dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.turn += p.spin * dt;
+        paint.save();
+        paint.translate(p.x, p.y);
+        paint.rotate(p.turn);
+        paint.fillStyle = p.color;
+        paint.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.turn * 1.7)) + 1);
+        paint.restore();
+      }
+      if (age >= lifetime) { stopConfetti(); return; }
+      confettiFrame = requestAnimationFrame(frame);
+    };
+    confettiFrame = requestAnimationFrame(frame);
+  }
+
+  function trackProgress(my) {
+    const bar = $('rewardBar');
+    const step = () => {
+      if (my !== seq || !current) return;
+      const share = (ctx.currentTime - current.start) / current.length;
+      bar.style.transform = 'scaleX(' + Math.max(0, Math.min(1, share)) + ')';
+      requestAnimationFrame(step);
+    };
+    step();
+  }
+
+  async function playReward(direct) {
+    unlock();
+    cancelAll();
+    const my = seq;
+    target = null;
+    const praise = direct ? '' : nextPraise();
+    $('rewardTitle').textContent = praise || 'Nhạc của Dora';
+    $('rewardSong').textContent = '';
+    $('rewardBar').style.transform = 'scaleX(0)';
+    $('rewardLink').hidden = true;
+    setMode('reward', praise);
+    if (!direct) {
+      launchConfetti();
+      // Lời khen chen vào đoạn cuối của tiếng nhạc mừng để Dora không phải chờ lâu.
+      const fanfare = playBuffer(sound('fanfare'));
+      await wait(850);
+      if (my !== seq) return;
+      if (settings.voice !== 'none') {
+        await speak(praise, WORDS[settings.voice].lang);
+        if (my !== seq) return;
+      }
+      await fanfare;
+      if (my !== seq) return;
+      $('status').textContent = COPY.reward;
+    }
+    const pick = takeReward();
+    if (CAN_EMBED && pick.link) {
+      const played = await playOnYouTube(pick.link, direct ? Infinity : (settings.clip || Infinity), my);
+      if (my !== seq) return;
+      if (played) {
+        setMode('idle', direct ? COPY.idle : COPY.next);
+        return;
+      }
+    }
+    // Không nhúng được YouTube thì nhạc tự phát là file hoặc giai điệu có sẵn, kèm nút mở bài YouTube.
+    if (pick.link) {
+      $('rewardLink').href = youtubeUrl(pick.link.youtube);
+      $('rewardLinkText').textContent = 'Mở “' + pick.link.name + '” trên YouTube';
+      $('rewardLink').hidden = false;
+    }
+    $('rewardSong').textContent = 'Đang mở: ' + pick.music.name;
+    let buffer;
+    let caption = 'Đang phát: ' + pick.music.name;
+    try {
+      buffer = await loadBuffer(pick.music);
+    } catch (e) {
+      buffer = sound('melody');
+      caption = 'Chưa mở được bài đã chọn, phát giai điệu có sẵn';
+    }
+    if (my !== seq) return;
+    $('rewardSong').textContent = caption;
+    const done = playBuffer(buffer, { limit: direct ? Infinity : (settings.clip || Infinity), gain: 0.95 });
+    trackProgress(my);
+    await done;
+    if (my !== seq) return;
+    setMode('idle', direct ? COPY.idle : COPY.next);
+  }
+
+  /* ---------- Kho bài hát ---------- */
+  const BUILTIN = { id: 'builtin', name: 'Giai điệu vui', where: 'builtin', duration: 15, tune: 'melody' };
+  const TUNES = [BUILTIN].concat(Object.keys(TUNE_BOOK).map((key) => ({
+    id: 'tune-' + key,
+    name: TUNE_BOOK[key].name,
+    where: 'builtin',
+    duration: Math.round(tuneSeconds(TUNE_BOOK[key])),
+    tune: key
+  })));
+  // Khi bài YouTube được chọn có giai điệu dân gian tương ứng thì tự phát đúng giai điệu đó.
+  const TUNE_FOR_VIDEO = { prCvGKoybNE: 'bingo', yCjJyiqpAuU: 'twinkle', YE7PiTwhTQk: 'mary', _6HzoUcx3eo: 'oldmac', '7otAJa3jui8': 'row' };
+  const cloud = { db: null, assets: null, slow: false, broken: false };
+  let cloudSongs = [];
+  let sharedSongs = [];
+  let localSongs = [];
+  let keepsLocally = true;
+  let confirmId = null;
+  let pendingFocus = '';
+  const memoryBytes = new Map();
+  const decoded = new Map();
+  let nextReward = null;
+  let lastRewardId = null;
+  let lastLinkId = null;
+  let lastChosenId = null;
+  let tuneBag = [];
+
+  const store = (function () {
+    let opening = null;
+    function open() {
+      if (opening) return opening;
+      opening = new Promise((resolve, reject) => {
+        try {
+          const request = indexedDB.open('dora-true-false', 1);
+          request.onupgradeneeded = () => {
+            request.result.createObjectStore('songs', { keyPath: 'id' });
+            request.result.createObjectStore('bytes');
+          };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        } catch (e) { reject(e); }
+      });
+      return opening;
+    }
+    function run(name, access, action) {
+      return open().then((db) => new Promise((resolve, reject) => {
+        const tx = db.transaction(name, access);
+        const request = action(tx.objectStore(name));
+        tx.oncomplete = () => resolve(request.result);
+        tx.onerror = tx.onabort = () => reject(tx.error);
+      }));
+    }
+    return {
+      songs: () => run('songs', 'readonly', (s) => s.getAll()),
+      putSong: (song) => run('songs', 'readwrite', (s) => s.put(song)),
+      dropSong: (id) => run('songs', 'readwrite', (s) => s.delete(id)),
+      bytes: (key) => run('bytes', 'readonly', (s) => s.get(key)),
+      putBytes: (key, value) => run('bytes', 'readwrite', (s) => s.put(value, key)),
+      dropBytes: (key) => run('bytes', 'readwrite', (s) => s.delete(key))
+    };
+  })();
+
+  const allSongs = () => cloudSongs.concat(sharedSongs, localSongs);
+
+  function decode(bytes) {
+    return new Promise((resolve, reject) => {
+      try {
+        const pending = getCtx().decodeAudioData(bytes, resolve, reject);
+        if (pending && pending.catch) pending.catch(reject);
+      } catch (e) { reject(e); }
+    });
+  }
+
+  // Kho tài sản chỉ nhận một số loại file, nên âm thanh được gói thành văn bản base64.
+  function toBase64(arrayBuffer) {
+    const bytes = new Uint8Array(arrayBuffer);
+    const chunk = 3 * 8192;
+    let out = '';
+    for (let i = 0; i < bytes.length; i += chunk) {
+      out += btoa(String.fromCharCode.apply(null, bytes.subarray(i, i + chunk)));
+    }
+    return out;
+  }
+  function fromBase64(text) {
+    const binary = atob(text.trim());
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes.buffer;
+  }
+
+  async function loadBytes(song) {
+    const key = song.assetId || song.id;
+    if (memoryBytes.has(key)) return memoryBytes.get(key);
+    try {
+      const cached = await store.bytes(key);
+      if (cached) return cached;
+    } catch (e) { /* không có bộ nhớ đệm thì tải lại */ }
+    if (!song.assetId) throw new Error('missing bytes');
+    const response = await fetch('/_blob/' + song.assetId);
+    if (!response.ok) throw new Error('fetch ' + response.status);
+    const bytes = fromBase64(await response.text());
+    store.putBytes(key, bytes).catch(() => {});
+    return bytes;
+  }
+
+  function loadBuffer(song) {
+    if (song.tune) return Promise.resolve(sound(song.tune));
+    if (decoded.has(song.id)) {
+      const hit = decoded.get(song.id);
+      decoded.delete(song.id);
+      decoded.set(song.id, hit);
+      return hit;
+    }
+    const pending = loadBytes(song).then((bytes) => decode(bytes.slice(0)));
+    decoded.set(song.id, pending);
+    pending.catch(() => decoded.delete(song.id));
+    while (decoded.size > 2) decoded.delete(decoded.keys().next().value);
+    return pending;
+  }
+
+  function pickOther(list, lastId) {
+    const pool = list.length > 1 ? list.filter((s) => s.id !== lastId) : list;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function tuneFor(video) {
+    const matching = video && TUNE_FOR_VIDEO[video.youtube];
+    if (matching) return TUNES.find((t) => t.tune === matching);
+    if (!tuneBag.length) tuneBag = shuffled(TUNES).filter((t) => t.id !== lastRewardId);
+    return tuneBag.pop();
+  }
+  // Mỗi lần thưởng gồm nhạc tự phát (music) và, nếu có, một bài YouTube để mở thêm (link).
+  function chooseReward() {
+    const songs = allSongs();
+    const fixedTune = TUNES.find((t) => t.id === settings.reward);
+    if (fixedTune) return { music: fixedTune, link: null };
+    const fixed = songs.find((s) => s.id === settings.reward);
+    if (fixed && !fixed.youtube) return { music: fixed, link: null };
+    if (CAN_EMBED && !fixed && songs.length) {
+      const chosen = pickOther(songs, lastChosenId);
+      return chosen.youtube ? { music: tuneFor(chosen), link: chosen } : { music: chosen, link: null };
+    }
+    const files = songs.filter((s) => !s.youtube);
+    const videos = songs.filter((s) => s.youtube);
+    const link = fixed || (videos.length ? pickOther(videos, lastLinkId) : null);
+    if (files.length && !fixed) return { music: pickOther(files, lastRewardId), link };
+    return { music: tuneFor(link), link };
+  }
+  function prepareReward() {
+    if (!nextReward) nextReward = chooseReward();
+    if (!(CAN_EMBED && nextReward.link)) loadBuffer(nextReward.music).catch(() => {});
+  }
+  function takeReward() {
+    const known = (s) => !s || s.where === 'builtin' || allSongs().some((x) => x.id === s.id);
+    const usable = nextReward && known(nextReward.music) && known(nextReward.link);
+    const pick = usable ? nextReward : chooseReward();
+    nextReward = null;
+    lastRewardId = pick.music.id;
+    if (pick.link) lastLinkId = pick.link.id;
+    lastChosenId = (pick.link || pick.music).id;
+    return pick;
+  }
+
+  function userError(text) { const e = new Error(text); e.userText = text; return e; }
+  function explain(error) {
+    if (error && error.userText) return error.userText;
+    const code = error && error.code;
+    if (code === 'quota_or_state' || code === 'quota_exceeded') return 'Hết chỗ lưu. Hãy xoá bớt bài rồi thử lại.';
+    if (code === 'too_large') return 'File quá lớn. Hãy chọn file dưới 15 MB.';
+    if (code === 'rate_limited' || code === 'resource_exhausted') return 'Thêm hơi nhanh. Hãy đợi ít phút rồi thử lại.';
+    return 'Chưa lưu được. Hãy kiểm tra mạng rồi thử lại.';
+  }
+
+  async function retryOnce(action, transientCode) {
+    try {
+      return await action();
+    } catch (e) {
+      if (!e || e.code !== transientCode) throw e;
+      await wait(1200 + Math.random() * 800);
+      return action();
+    }
+  }
+
+  function cleanName(fileName) {
+    const name = fileName.replace(/\.[^.]+$/, '').replace(/_+/g, ' ').trim();
+    return (name || 'Bài hát').slice(0, 80);
+  }
+
+  let cloudReady = Promise.resolve();
+
+  function newLocalId() {
+    return 'local-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  }
+
+  // Chỉ giữ mã video đã kiểm tra, rồi tự dựng link, nên không có link lạ nào lọt vào trang.
+  function parseYouTube(text) {
+    const raw = text.trim();
+    let url;
+    try {
+      url = new URL(/^https?:\/\//i.test(raw) ? raw : 'https://' + raw);
+    } catch (e) {
+      return null;
+    }
+    const host = url.hostname.toLowerCase().replace(/^(www|m|music)\./, '');
+    let id = null;
+    if (host === 'youtu.be') {
+      id = url.pathname.split('/')[1];
+    } else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+      id = url.searchParams.get('v');
+      if (!id) {
+        const match = url.pathname.match(/^\/(?:shorts|embed|live)\/([^/]+)/);
+        if (match) id = match[1];
+      }
+    }
+    return id && YOUTUBE_ID.test(id) ? id : null;
+  }
+
+  function youtubeUrl(id) {
+    return 'https://www.youtube.com/watch?v=' + id;
+  }
+
+  async function addYouTube(link, givenName) {
+    const id = parseYouTube(link);
+    if (!id) throw userError('Link này không phải một bài trên YouTube. Hãy dán link dạng youtube.com/watch?v=... hoặc youtu.be/...');
+    await cloudReady;
+    const songs = allSongs();
+    if (songs.some((s) => s.youtube === id)) throw userError('Bài này đã có trong danh sách.');
+    const count = songs.filter((s) => s.youtube).length;
+    const meta = { name: (givenName.trim() || 'Bài YouTube ' + (count + 1)).slice(0, 80), youtube: id, addedAt: Date.now() };
+    if (cloud.db && cloud.assets) {
+      const ref = cloud.db.collection('songs').doc();
+      await retryOnce(() => ref.set(meta), 'unavailable');
+      return;
+    }
+    const song = Object.assign({ id: newLocalId(), where: 'local' }, meta);
+    try {
+      await store.putSong(song);
+    } catch (e) {
+      keepsLocally = false;
+    }
+    localSongs.push(song);
+  }
+
+  async function addOne(file) {
+    if (file.size > MAX_BYTES) throw userError('File lớn hơn 15 MB. Hãy chọn file nhỏ hơn.');
+    const bytes = await file.arrayBuffer();
+    let buffer;
+    try {
+      buffer = await decode(bytes.slice(0));
+    } catch (e) {
+      throw userError('Máy này không đọc được file. Hãy thử file mp3 hoặc m4a.');
+    }
+    if (buffer.duration > MAX_SECONDS) throw userError('Bài dài hơn 10 phút. Hãy chọn bài ngắn hơn.');
+    const meta = { name: cleanName(file.name), duration: Math.round(buffer.duration), size: file.size, addedAt: Date.now() };
+
+    if (cloud.db && cloud.assets) {
+      const packed = new Blob([toBase64(bytes)], { type: 'text/plain' });
+      const asset = await retryOnce(() => cloud.assets.upload(packed, { type: 'text/plain' }), 'store_unavailable');
+      const ref = cloud.db.collection('songs').doc();
+      try {
+        await retryOnce(() => ref.set(Object.assign({}, meta, { assetId: asset.id })), 'unavailable');
+      } catch (e) {
+        cloud.assets.delete(asset.id).catch(() => {});
+        throw e;
+      }
+      store.putBytes(asset.id, bytes).catch(() => {});
+      return;
+    }
+
+    const id = newLocalId();
+    const song = Object.assign({ id, where: 'local' }, meta);
+    try {
+      await store.putBytes(id, bytes);
+      await store.putSong(song);
+      if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+    } catch (e) {
+      memoryBytes.set(id, bytes);
+      keepsLocally = false;
+    }
+    localSongs.push(song);
+  }
+
+  function showMessage(text, isError) {
+    const box = $('sheetMsg');
+    box.hidden = !text;
+    box.textContent = text || '';
+    box.classList.toggle('err', !!isError);
+  }
+
+  async function addFiles(list) {
+    const files = Array.from(list);
+    if (!files.length) return;
+    await cloudReady;
+    const problems = [];
+    for (let i = 0; i < files.length; i++) {
+      showMessage('Đang thêm ' + (i + 1) + '/' + files.length + ': ' + files[i].name);
+      try {
+        await addOne(files[i]);
+      } catch (e) {
+        problems.push(files[i].name + ': ' + explain(e));
+      }
+    }
+    nextReward = null;
+    renderWhere();
+    renderSongs();
+    if (problems.length) showMessage(problems.join('\n'), true);
+    else showMessage('Đã thêm ' + files.length + ' bài. Bấm nút tròn để nghe thử.');
+  }
+
+  async function removeSong(song) {
+    showMessage('');
+    try {
+      if (song.where === 'cloud') {
+        await retryOnce(() => cloud.db.doc('songs/' + song.id).delete(), 'unavailable');
+        if (song.assetId) {
+          await cloud.assets.delete(song.assetId);
+          store.dropBytes(song.assetId).catch(() => {});
+        }
+      } else {
+        localSongs = localSongs.filter((s) => s.id !== song.id);
+        memoryBytes.delete(song.id);
+        await Promise.all([store.dropSong(song.id), store.dropBytes(song.id)]);
+      }
+    } catch (e) {
+      showMessage('Chưa xoá được ' + song.name + '. Hãy kiểm tra mạng rồi thử lại.', true);
+    }
+    decoded.delete(song.id);
+    if (settings.reward === song.id) { settings.reward = 'random'; saveSettings(); }
+    nextReward = null;
+    confirmId = null;
+    renderSongs();
+  }
+
+  async function previewSong(song) {
+    unlock();
+    if (previewId === song.id) { cancelAll(); return; }
+    if (mode === 'reward') { cancelAll(); setMode('idle'); }
+    cancelAll();
+    const my = seq;
+    previewId = song.id;
+    markPreview(song.id, true);
+    try {
+      const buffer = await loadBuffer(song);
+      if (my !== seq) return;
+      await playBuffer(buffer, { gain: 0.95 });
+    } catch (e) {
+      if (my === seq) showMessage('Chưa mở được ' + song.name + '. Hãy kiểm tra mạng rồi thử lại.', true);
+    }
+    if (my === seq && previewId) { const id = previewId; previewId = null; markPreview(id, false); }
+  }
+
+  // Chỉ đổi biểu tượng của nút đang nghe thử, không vẽ lại cả danh sách.
+  function markPreview(id, playing) {
+    const el = Array.from($('songList').querySelectorAll('[data-key]')).find((b) => b.dataset.key === 'play:' + id);
+    if (!el) return;
+    el.setAttribute('aria-label', (playing ? 'Dừng ' : 'Nghe thử ') + el.dataset.name);
+    el.replaceChildren(icon(playing ? 'i-stop' : 'i-play'));
+  }
+
+  /* ---------- Vẽ phần bài hát ---------- */
+  function formatTime(seconds) {
+    const total = Math.max(0, Math.round(Number(seconds) || 0));
+    return Math.floor(total / 60) + ':' + String(total % 60).padStart(2, '0');
+  }
+
+  function icon(name) {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'icon');
+    svg.setAttribute('aria-hidden', 'true');
+    const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    use.setAttribute('href', '#' + name);
+    svg.appendChild(use);
+    return svg;
+  }
+
+  function button(className, text, onClick, key) {
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.className = className;
+    if (text) el.textContent = text;
+    if (key) el.dataset.key = key;
+    el.addEventListener('click', onClick);
+    return el;
+  }
+
+  function canDelete(song) {
+    if (song.where === 'builtin' || song.where === 'shared') return false;
+    return song.where === 'local' || !!(cloud.db && cloud.assets);
+  }
+
+  function songRow(song) {
+    const row = document.createElement('li');
+    row.className = 'song';
+    if (song.youtube) {
+      const open = document.createElement('a');
+      open.className = 'song-play';
+      open.href = youtubeUrl(song.youtube);
+      open.target = '_blank';
+      open.rel = 'noopener noreferrer';
+      open.setAttribute('aria-label', 'Mở ' + song.name + ' trên YouTube');
+      open.appendChild(icon('i-open'));
+      row.appendChild(open);
+    } else {
+      const playing = previewId === song.id;
+      const play = button('song-play', '', () => previewSong(song), 'play:' + song.id);
+      play.dataset.name = song.name;
+      play.setAttribute('aria-label', (playing ? 'Dừng ' : 'Nghe thử ') + song.name);
+      play.appendChild(icon(playing ? 'i-stop' : 'i-play'));
+      row.appendChild(play);
+    }
+
+    const info = document.createElement('div');
+    info.className = 'song-info';
+    const name = document.createElement('span');
+    name.className = 'song-name';
+    name.textContent = song.name;
+    const meta = document.createElement('span');
+    meta.className = 'song-meta';
+    const labels = song.youtube ? ['YouTube'] : [formatTime(song.duration)];
+    if (song.where === 'builtin') labels.push('Có sẵn');
+    if (song.where === 'local') labels.push('Chỉ trên máy này');
+    meta.textContent = labels.join(' · ');
+    info.append(name, meta);
+    row.appendChild(info);
+
+    if (canDelete(song)) {
+      const actions = document.createElement('div');
+      actions.className = 'song-actions';
+      if (confirmId === song.id) {
+        actions.append(
+          button('song-del danger', 'Xoá hẳn', () => removeSong(song), 'sure:' + song.id),
+          button('song-del', 'Giữ lại', () => {
+            confirmId = null;
+            pendingFocus = 'del:' + song.id;
+            renderSongs();
+          }, 'keep:' + song.id)
+        );
+      } else {
+        actions.append(button('song-del', 'Xoá', () => {
+          confirmId = song.id;
+          pendingFocus = 'keep:' + song.id;
+          renderSongs();
+        }, 'del:' + song.id));
+      }
+      row.appendChild(actions);
+    }
+    return row;
+  }
+
+  function renderSongs() {
+    const list = $('songList');
+    const panel = $('sheet');
+    const scrollTop = panel.scrollTop;
+    const listTop = list.scrollTop;
+    const active = document.activeElement;
+    const focusKey = pendingFocus || (active && active.dataset ? active.dataset.key : '');
+    pendingFocus = '';
+    const songs = allSongs();
+    list.replaceChildren.apply(list, songs.map((s) => songRow(s)).concat(TUNES.map((t) => songRow(t))));
+    const pick = $('rewardPick');
+    const options = [['random', songs.length ? 'Ngẫu nhiên trong danh sách' : 'Tự chọn khi có bài hát']]
+      .concat(songs.map((s) => [s.id, s.name]))
+      .concat(TUNES.map((t) => [t.id, t.name + ' (có sẵn)']));
+    pick.replaceChildren.apply(pick, options.map((pair) => {
+      const option = document.createElement('option');
+      option.value = pair[0];
+      option.textContent = pair[1];
+      return option;
+    }));
+    pick.value = options.some((pair) => pair[0] === settings.reward) ? settings.reward : 'random';
+    // Vẽ lại danh sách không được làm mất vị trí đang cuộn và nút đang chọn.
+    if (focusKey) {
+      const again = Array.from(list.querySelectorAll('[data-key]')).find((el) => el.dataset.key === focusKey);
+      if (again) again.focus({ preventScroll: true });
+    }
+    panel.scrollTop = scrollTop;
+    list.scrollTop = listTop;
+  }
+
+  async function renderWhere() {
+    let text;
+    if (cloud.db && cloud.assets) {
+      text = 'Bài hát lưu cùng trang này, nên điện thoại và tablet đăng nhập cùng tài khoản dùng chung một danh sách.';
+    } else if (cloud.db) {
+      text = 'Bạn đang xem danh sách chung. Bài bạn thêm chỉ nằm trên máy này.';
+    } else {
+      text = 'Bài hát lưu trên máy này. Mỗi máy cần thêm bài riêng.';
+    }
+    if (!keepsLocally) text += ' Trình duyệt này không cho lưu lâu dài, nên bài vừa thêm sẽ mất khi đóng trang.';
+    if (cloud.slow) text += ' Chưa tải được danh sách chung. Hãy kiểm tra mạng.';
+    if (cloud.broken) text += ' Danh sách chung đang không mở được. Hãy tải lại trang.';
+    $('whereNote').textContent = text;
+    if (cloud.db && cloud.assets && $('sheet').open) {
+      try {
+        const usage = (await cloud.assets.list()).usage;
+        if (usage && usage.maxBytes) {
+          const mb = (n) => Math.round(n / 1048576);
+          $('whereNote').textContent = text + ' Đã dùng ' + mb(usage.bytes) + ' MB trên ' + mb(usage.maxBytes) + ' MB.';
+        }
+      } catch (e) { /* chỉ để tham khảo */ }
+    }
+  }
+
+  function renderWords() {
+    const words = settings.voice === 'vi' ? WORDS.vi : WORDS.en;
+    document.querySelectorAll('[data-word]').forEach((el) => {
+      el.textContent = words[el.getAttribute('data-word')];
+    });
+  }
+
+  function renderVoiceNote() {
+    const note = $('voiceNote');
+    let text = '';
+    if (settings.voice !== 'none') {
+      const found = findVoice(WORDS[settings.voice].lang);
+      if (!('speechSynthesis' in window)) {
+        text = 'Trình duyệt này không có giọng đọc, nên chỉ phát tiếng chuông.';
+      } else if (found.known && !found.voice) {
+        text = settings.voice === 'vi'
+          ? 'Máy này chưa có giọng tiếng Việt, nên chỉ phát tiếng chuông. Có thể tải thêm giọng đọc trong phần cài đặt của máy.'
+          : 'Máy này chưa có giọng tiếng Anh, nên chỉ phát tiếng chuông.';
+      }
+    }
+    note.textContent = text;
+    note.hidden = !text;
+  }
+
+  function syncForm() {
+    $('hintToggle').checked = !!settings.hint;
+    const clip = document.querySelector('input[name="clip"][value="' + Number(settings.clip) + '"]');
+    if (clip) clip.checked = true;
+    const voice = document.querySelector('input[name="voice"][value="' + (WORDS[settings.voice] || settings.voice === 'none' ? settings.voice : 'en') + '"]');
+    if (voice) voice.checked = true;
+  }
+
+  /* ---------- Kết nối kho dùng chung ---------- */
+  async function connectCloud() {
+    if (!window.claude || typeof window.claude.use !== 'function') return;
+    const parts = await Promise.all([
+      window.claude.use('db').catch(() => null),
+      window.claude.use('assets').catch(() => null)
+    ]);
+    cloud.db = parts[0];
+    cloud.assets = parts[1];
+    renderWhere();
+    if (!cloud.db) return;
+    const slowTimer = setTimeout(() => { cloud.slow = true; renderWhere(); }, 10000);
+    cloud.db.collection('songs').orderBy('addedAt').onSnapshot((snapshot) => {
+      cloudSongs = snapshot.docs
+        .filter((d) => d.exists)
+        .map((d) => Object.assign({}, d.data(), { id: d.id, where: 'cloud' }))
+        .filter((s) => typeof s.name === 'string' && (YOUTUBE_ID.test(String(s.youtube)) || ASSET_ID.test(String(s.assetId))));
+      if (!snapshot.metadata.fromCache) {
+        clearTimeout(slowTimer);
+        if (cloud.slow) { cloud.slow = false; renderWhere(); }
+      }
+      renderSongs();
+    }, () => {
+      clearTimeout(slowTimer);
+      cloud.slow = false;
+      cloud.broken = true;
+      renderWhere();
+    });
+  }
+
+  // Ở địa chỉ riêng, danh sách chung nằm trong file songs.json đi kèm trang.
+  async function loadSharedSongs() {
+    if (!CAN_EMBED) return;
+    $('ytHelp').textContent = 'Bài YouTube phát ngay trong trò chơi. Nếu máy chặn tự phát, chỉ cần chạm vào video.';
+    try {
+      const response = await fetch('songs.json', { cache: 'no-store' });
+      if (!response.ok) return;
+      const rows = await response.json();
+      sharedSongs = rows
+        .filter((r) => r && typeof r.name === 'string' && YOUTUBE_ID.test(String(r.youtube)))
+        .map((r) => ({ id: 'shared-' + r.youtube, name: r.name.slice(0, 80), youtube: r.youtube, where: 'shared', addedAt: 0 }));
+      nextReward = null;
+      renderSongs();
+    } catch (e) { /* không có danh sách chung thì dùng bài trên máy */ }
+  }
+
+  async function loadLocalSongs() {
+    try {
+      localSongs = (await store.songs()).sort((a, b) => a.addedAt - b.addedAt);
+      renderSongs();
+    } catch (e) {
+      keepsLocally = false;
+      renderWhere();
+    }
+  }
+
+  /* ---------- Sự kiện ---------- */
+  ['pointerup', 'touchend', 'click', 'keydown'].forEach((name) => {
+    window.addEventListener(name, unlock, { capture: true, passive: true });
+  });
+
+  // Nút to phản hồi ngay khi chạm, để bàn tay nhỏ không cần nhấc tay gọn gàng.
+  Object.keys(PADS).forEach((kind) => {
+    const pad = PADS[kind];
+    let fromPointer = false;
+    pad.addEventListener('pointerdown', () => { fromPointer = true; tapPad(kind); });
+    pad.addEventListener('click', () => {
+      if (fromPointer) { fromPointer = false; return; }
+      tapPad(kind);
+    });
+    pad.addEventListener('contextmenu', (event) => event.preventDefault());
+  });
+
+  COACH.true.addEventListener('click', () => ask('true'));
+  COACH.false.addEventListener('click', () => ask('false'));
+  $('coachSong').addEventListener('click', () => playReward(true));
+  $('replay').addEventListener('click', () => { if (target) ask(target); });
+  $('stopBtn').addEventListener('click', () => { cancelAll(); setMode('idle'); });
+
+  const sheet = $('sheet');
+  $('openSheet').addEventListener('click', () => {
+    syncForm();
+    renderSongs();
+    renderVoiceNote();
+    showMessage('');
+    sheet.showModal();
+    renderWhere();
+  });
+  $('closeSheet').addEventListener('click', () => sheet.close());
+  sheet.addEventListener('close', () => { if (previewId) cancelAll(); confirmId = null; });
+
+  $('fileInput').addEventListener('change', (event) => {
+    const picked = event.target.files;
+    addFiles(picked).finally(() => { event.target.value = ''; });
+  });
+  $('ytForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if ($('ytAdd').disabled) return;
+    $('ytAdd').disabled = true;
+    try {
+      await addYouTube($('ytUrl').value, $('ytName').value);
+      $('ytUrl').value = '';
+      $('ytName').value = '';
+      nextReward = null;
+      renderSongs();
+      showMessage('Đã thêm link YouTube.');
+    } catch (e) {
+      showMessage(explain(e), true);
+    }
+    $('ytAdd').disabled = false;
+  });
+  $('rewardLink').addEventListener('click', () => {
+    // Dừng nhạc ngay để không chồng tiếng với YouTube; đợi một nhịp rồi mới đóng màn để link kịp mở.
+    cancelAll();
+    setTimeout(() => {
+      if (mode === 'reward') setMode('idle', COPY.next);
+    }, 400);
+  });
+  $('rewardPick').addEventListener('change', (event) => {
+    settings.reward = event.target.value;
+    nextReward = null;
+    saveSettings();
+  });
+  document.querySelectorAll('input[name="clip"]').forEach((input) => {
+    input.addEventListener('change', () => { settings.clip = Number(input.value); saveSettings(); });
+  });
+  document.querySelectorAll('input[name="voice"]').forEach((input) => {
+    input.addEventListener('change', () => {
+      settings.voice = input.value;
+      saveSettings();
+      renderWords();
+      renderVoiceNote();
+    });
+  });
+  $('hintToggle').addEventListener('change', (event) => { settings.hint = event.target.checked; saveSettings(); });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      const wasReward = mode === 'reward';
+      cancelAll();
+      if (wasReward) setMode('idle');
+    } else if (armed) {
+      requestWakeLock();
+    }
+  });
+  if ('speechSynthesis' in window) {
+    speechSynthesis.addEventListener('voiceschanged', renderVoiceNote);
+  }
+
+  /* ---------- Khởi động ---------- */
+  renderWords();
+  syncForm();
+  setMode('idle');
+  renderSongs();
+  renderWhere();
+  loadLocalSongs();
+  loadSharedSongs();
+  cloudReady = connectCloud();
+})();
+</script>
+
+</body></html>
