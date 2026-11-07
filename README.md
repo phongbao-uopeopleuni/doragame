@@ -5,15 +5,17 @@ Trò chơi giúp bé nhận biết True và False qua âm thanh, dùng trên đi
 ## Cách chơi
 
 1. Hỏi bé một câu, ví dụ: "Đây là con mèo phải không?"
-2. Người chơi cùng bấm đáp án đúng ở hàng nút phía trên để bé nghe tiếng của đáp án đó.
-3. Bé bấm một nút to. Chọn đúng thì có pháo giấy, lời khen rồi nhạc tự phát. Chọn nhầm thì bé nghe lại và chọn lại.
+2. Bấm True: trống dồn "ta-da!", máy reo "It's true!", rồi nhạc tiệc tùng có vỗ tay và pháo giấy trong lúc máy khen bé.
+3. Bấm False: máy đọc nhẹ nhàng "It's false.", không phát nhạc.
+4. Muốn nghe bài hát, bấm "Phát nhạc". Bài hát gồm vài giai điệu có sẵn và file nhạc tự thêm trên máy.
+
+Mọi âm thanh của True và False được tạo ngay trong trang, không cần tải file nào.
 
 ## Các file
 
 - `index.html`: toàn bộ trò chơi, không cần bước build.
-- `songs.json`: danh sách bài hát trên YouTube, mỗi dòng gồm tên bài và mã video.
 
-Bài hát thêm ngay trong trang chỉ được lưu trên máy đang dùng. Muốn mọi máy cùng thấy một bài, hãy thêm bài đó vào `songs.json`.
+File nhạc thêm trong trang chỉ được lưu trên máy đang dùng.
 
 ## Chạy thử trên máy
 

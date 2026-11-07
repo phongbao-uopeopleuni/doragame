@@ -166,26 +166,9 @@ button { cursor: pointer; }
   background: var(--sun-ink); color: var(--sun);
   font-weight: 600;
 }
-.stop-quiet { background: transparent; color: var(--sun-ink); border: 2px solid var(--sun-ink); }
 .reward-actions { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 100%; }
-.yt-link { padding: 6px 20px; font-size: 15px; justify-content: center; text-align: center; text-decoration: none; min-width: 0; overflow-wrap: anywhere; }
 #confetti { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
 .reward-body { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; min-width: 0; }
-.yt-host { position: relative; flex: none; width: min(100%, 640px); min-width: 200px; min-height: 200px; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: var(--sun-ink); }
-.yt-host iframe, #ytPlayer { display: block; width: 100%; height: 100%; border: 0; }
-.reward.with-video { justify-content: flex-start; overflow-y: auto; }
-.reward.with-video h2 { font-size: clamp(28px, min(9vw, 6vh), 60px); }
-.reward.with-video #rewardPraise { font-size: clamp(18px, min(5vw, 3.5vh), 28px); }
-.reward.with-video .note { display: none; }
-@media (max-aspect-ratio: 1/1) {
-  .reward.with-video .reward-body { margin-top: auto; }
-  .reward.with-video .yt-host { margin-bottom: auto; }
-}
-@media (min-aspect-ratio: 1/1) {
-  .reward.with-video { flex-direction: row; justify-content: center; align-items: center; }
-  .reward.with-video .reward-body { flex: 1 1 40%; width: auto; }
-  .yt-host { width: min(56%, calc(62vh * 16 / 9)); }
-}
 .note { position: absolute; left: var(--x); bottom: -44px; width: 36px; height: 36px; color: var(--sun-ink); opacity: 0; animation: rise 3.4s linear infinite; animation-delay: var(--d); }
 @keyframes rise {
   0% { transform: translateY(0) rotate(-8deg); opacity: 0; }
@@ -231,13 +214,6 @@ button { cursor: pointer; }
   font-weight: 600; cursor: pointer;
 }
 #fileInput:focus-visible + .add { outline: 3px solid var(--ink); outline-offset: 3px; }
-.link-form { display: grid; gap: 10px; padding-top: 14px; border-top: 1px solid var(--line); }
-.text-input {
-  width: 100%; min-height: 50px; padding: 0 12px;
-  border: 2px solid var(--line); border-radius: 14px;
-  background: var(--shelf); color: var(--ink); font: inherit; font-size: 16px;
-  -webkit-user-select: text; user-select: text;
-}
 #sheetMsg { margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--ground); font-size: 14px; overflow-wrap: anywhere; white-space: pre-line; }
 #sheetMsg.err { color: var(--false-text); font-weight: 600; }
 
@@ -321,7 +297,6 @@ button { cursor: pointer; }
   <symbol id="i-sound" viewBox="0 0 24 24"><path fill="currentColor" d="M4 9.5v5h3.5L12 19V5L7.5 9.5z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.8 7.8 0 0 1 0 11"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.2v13.6L19.5 12z"/></symbol>
   <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2" fill="currentColor"/></symbol>
-  <symbol id="i-open" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M14 5h5v5M19 5l-8.5 8.5M17 14v4a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 5 18V8.5A1.5 1.5 0 0 1 6.5 7H10"/></symbol>
 </svg>
 
 <div class="app">
@@ -371,12 +346,8 @@ button { cursor: pointer; }
           <button id="stopBtn" class="stop" type="button">
             <svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg>Dừng nhạc
           </button>
-          <a id="rewardLink" class="stop stop-quiet yt-link" target="_blank" rel="noopener noreferrer" hidden>
-            <svg class="icon" aria-hidden="true"><use href="#i-open"/></svg><span id="rewardLinkText"></span>
-          </a>
         </div>
       </div>
-      <div id="ytHost" class="yt-host" hidden><div id="ytPlayer"></div></div>
     </section>
   </main>
 </div>
@@ -396,37 +367,17 @@ button { cursor: pointer; }
           <svg class="icon" aria-hidden="true"><use href="#i-note"/></svg>Thêm bài hát từ máy
         </label>
       </div>
-      <p class="help">Chọn file nhạc như mp3 hoặc m4a, mỗi file tối đa 15 MB và 10 phút. Có thể chọn nhiều bài cùng lúc. Khi bấm True, file nhạc được ưu tiên tự phát.</p>
-      <form id="ytForm" class="link-form">
-        <div class="field">
-          <label for="ytUrl">Hoặc dán link bài hát trên YouTube</label>
-          <input id="ytUrl" class="text-input" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://www.youtube.com/watch?v=...">
-        </div>
-        <div class="field">
-          <label for="ytName">Tên bài để dễ nhận ra</label>
-          <input id="ytName" class="text-input" type="text" maxlength="80" autocomplete="off" placeholder="Ví dụ: Bài hát tiếng Anh Dora thích">
-        </div>
-        <button id="ytAdd" class="ghost" type="submit">Thêm link YouTube</button>
-        <p id="ytHelp" class="help">Bài YouTube không tự phát được trong trò chơi. Khi bấm True, trang tự phát nhạc có sẵn hoặc file nhạc, kèm nút để người chơi cùng mở bài YouTube.</p>
-      </form>
+      <p class="help">Chọn file nhạc như mp3 hoặc m4a, mỗi file tối đa 15 MB và 10 phút. Có thể chọn nhiều bài cùng lúc. Bấm Phát nhạc ở trên để nghe các bài này.</p>
       <p id="sheetMsg" role="status" hidden></p>
       <ul id="songList" class="songs"></ul>
     </section>
 
     <section>
-      <h3>Sau khi bấm True</h3>
+      <h3>Nút Phát nhạc</h3>
       <div class="field">
         <label for="rewardPick">Phát bài</label>
         <select id="rewardPick"></select>
       </div>
-      <fieldset class="field">
-        <legend>Phát trong bao lâu</legend>
-        <div class="seg">
-          <input class="vh" type="radio" name="clip" id="clip15" value="15"><label for="clip15">15 giây</label>
-          <input class="vh" type="radio" name="clip" id="clip30" value="30"><label for="clip30">30 giây</label>
-          <input class="vh" type="radio" name="clip" id="clip0" value="0"><label for="clip0">Cả bài</label>
-        </div>
-      </fieldset>
     </section>
 
     <section>
@@ -448,8 +399,9 @@ button { cursor: pointer; }
       <h3>Cách chơi</h3>
       <ol class="steps">
         <li>Hỏi Dora một câu, ví dụ: “Đây là con mèo phải không?”</li>
-        <li>Bấm True: máy reo “It's true!”, có pháo giấy và lời khen, rồi tự phát một bài hát Dora thích.</li>
+        <li>Bấm True: trống dồn “ta-da!”, máy reo “It's true!”, rồi nhạc tiệc tùng có vỗ tay và pháo giấy trong lúc máy khen Dora.</li>
         <li>Bấm False: máy đọc nhẹ nhàng “It's false.”, không phát nhạc.</li>
+        <li>Muốn nghe bài hát, bấm Phát nhạc ở trên.</li>
       </ol>
     </section>
   </div>
@@ -466,10 +418,7 @@ button { cursor: pointer; }
 
   const MAX_BYTES = 15 * 1024 * 1024;
   const MAX_SECONDS = 10 * 60;
-  const YOUTUBE_ID = /^[A-Za-z0-9_-]{11}$/;
   const ASSET_ID = /^[0-9a-f]{32}$/;
-  // Khung claude.ai không cho nhúng YouTube; chạy ở địa chỉ riêng thì phát được ngay trong trang.
-  const CAN_EMBED = !(window.claude && typeof window.claude.use === 'function');
   const COPY = {
     idle: 'Hỏi Dora một câu, rồi bấm True hoặc False.',
     reward: 'Đang phát nhạc cho Dora.',
@@ -489,7 +438,7 @@ button { cursor: pointer; }
 
   /* ---------- Cài đặt: mỗi máy tự nhớ ---------- */
   const SETTINGS_KEY = 'dora-true-false-settings';
-  const settings = { voice: 'en', clip: 30, reward: 'random' };
+  const settings = { voice: 'en', reward: 'random' };
   try { Object.assign(settings, JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}')); } catch (e) { /* dùng mặc định */ }
   function saveSettings() {
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) { /* không bắt buộc */ }
@@ -530,9 +479,8 @@ button { cursor: pointer; }
     }
     requestWakeLock();
     renderVoiceNote();
-    // Chuẩn bị sẵn bài kế tiếp để sau lời khen nhạc phát ngay.
-    if (CAN_EMBED) loadYouTubeApi().catch(() => {});
-    setTimeout(prepareReward, 1500);
+    // Dựng sẵn tiếng thưởng để lần bấm True đầu tiên kêu ngay.
+    setTimeout(() => { sound('tada'); sound('party'); }, 400);
   }
 
   async function requestWakeLock() {
@@ -548,17 +496,71 @@ button { cursor: pointer; }
   const TIMBRE = {
     bell: [[1, 1, 3.2], [2, 0.45, 5.5], [3.01, 0.2, 8], [4.2, 0.08, 12]],
     wood: [[1, 1, 3.8], [2, 0.38, 7], [3, 0.14, 11]],
-    soft: [[1, 1, 2.2], [2, 0.3, 4]]
+    soft: [[1, 1, 2.2], [2, 0.3, 4]],
+    brass: [[1, 1, 0.6], [2, 0.7, 0.9], [3, 0.5, 1.2], [4, 0.32, 1.6], [5, 0.2, 2], [6, 0.12, 2.5]],
+    bass: [[1, 1, 1.5], [2, 0.5, 2.5], [3, 0.2, 4]]
   };
 
-  function render(notes, seconds) {
+  // Trống tổng hợp từ tiếng ồn có hạt giống cố định, nên lần nào nghe cũng giống nhau.
+  let noiseSeed = 12345;
+  const noise = () => { noiseSeed = (noiseSeed * 16807) % 2147483647; return noiseSeed / 1073741823.5 - 1; };
+  const DRUMS = {
+    kick(out, from, length, rate, g) {
+      let phase = 0;
+      for (let i = 0; i < length; i++) {
+        const t = i / rate;
+        phase += 2 * Math.PI * (48 + 110 * Math.exp(-t * 28)) / rate;
+        out[from + i] += g * Math.exp(-t * 9) * Math.sin(phase) * Math.min(1, (length - i) / (0.01 * rate));
+      }
+    },
+    snare(out, from, length, rate, g) {
+      let prev = 0;
+      for (let i = 0; i < length; i++) {
+        const t = i / rate;
+        const w = noise();
+        out[from + i] += g * (0.75 * (w - prev) * Math.exp(-t * 20) + 0.45 * Math.sin(2 * Math.PI * 185 * t) * Math.exp(-t * 28));
+        prev = w;
+      }
+    },
+    hat(out, from, length, rate, g) {
+      let prev = 0;
+      for (let i = 0; i < length; i++) {
+        const w = noise();
+        out[from + i] += g * 0.5 * (w - prev) * Math.exp(-(i / rate) * 55);
+        prev = w;
+      }
+    },
+    clap(out, from, length, rate, g) {
+      let prev = 0;
+      for (let i = 0; i < length; i++) {
+        const t = i / rate;
+        let env = 0.5 * Math.exp(-t * 14);
+        for (let k = 0; k < 3; k++) if (t >= k * 0.011) env += Math.exp(-(t - k * 0.011) * 180);
+        const w = noise();
+        out[from + i] += g * 0.6 * (w - prev) * env;
+        prev = w;
+      }
+    },
+    crash(out, from, length, rate, g) {
+      let prev = 0;
+      for (let i = 0; i < length; i++) {
+        const w = noise();
+        out[from + i] += g * 0.6 * (w - prev) * Math.exp(-(i / rate) * 2.6) * Math.min(1, (length - i) / (0.05 * rate));
+        prev = w;
+      }
+    }
+  };
+
+  function render(notes, seconds, drive) {
     const c = getCtx();
     const rate = c.sampleRate;
     const buffer = c.createBuffer(1, Math.ceil(seconds * rate), rate);
     const out = buffer.getChannelData(0);
+    noiseSeed = 12345;
     for (const n of notes) {
       const from = Math.floor(n.t * rate);
       const length = Math.min(out.length - from, Math.floor(n.d * rate));
+      if (DRUMS[n.k]) { DRUMS[n.k](out, from, length, rate, n.g); continue; }
       const attack = n.a || 0.004;
       const slide = n.s || 0;
       const release = 0.02 * rate;
@@ -573,7 +575,11 @@ button { cursor: pointer; }
     }
     let peak = 0;
     for (let i = 0; i < out.length; i++) peak = Math.max(peak, Math.abs(out[i]));
-    if (peak > 0) for (let i = 0; i < out.length; i++) out[i] *= 0.85 / peak;
+    if (peak > 0) {
+      // drive nén nhẹ để tiếng thưởng dày và to hơn mà không bị vỡ.
+      const shape = drive ? (x) => Math.tanh(drive * x) / Math.tanh(drive) : (x) => x;
+      for (let i = 0; i < out.length; i++) out[i] = 0.85 * shape(out[i] / peak);
+    }
     return buffer;
   }
 
@@ -584,9 +590,6 @@ button { cursor: pointer; }
       { t: 0, f: hz(67), d: 0.45, g: 1, k: 'wood', a: 0.012, s: 0.12 },
       { t: 0.27, f: hz(62), d: 0.7, g: 1, k: 'wood', a: 0.012, s: 0.12 }
     ], 1),
-    fanfare: () => render(
-      [72, 76, 79, 84, 88].map((m, i) => ({ t: i * 0.09, f: hz(m), d: 0.7, g: 1, k: 'bell' }))
-        .concat([72, 79, 84, 88].map((m) => ({ t: 0.5, f: hz(m), d: 1, g: 0.55, k: 'bell' }))), 1.5),
     melody: () => {
       const beat = 0.46;
       const tune = [[67, 1], [69, 0.5], [72, 0.5], [76, 1], [72, 1], [74, 1], [72, 0.5], [69, 0.5], [67, 2],
@@ -662,6 +665,56 @@ button { cursor: pointer; }
   }
   Object.keys(TUNE_BOOK).forEach((key) => { RECIPES[key] = () => renderTune(TUNE_BOOK[key]); });
 
+  // Tiếng thưởng của True: "ta-da!" có trống dồn, rồi một đoạn nhạc tiệc tùng 140 nhịp/phút có vỗ tay.
+  RECIPES.tada = () => {
+    const notes = [];
+    for (let i = 0; i < 12; i++) notes.push({ t: i * 0.04, d: 0.12, g: 0.2 + i * 0.05, k: 'snare' });
+    [55, 59, 62, 67].forEach((m) => notes.push({ t: 0.36, f: hz(m), d: 0.12, g: 0.32, k: 'brass', a: 0.01 }));
+    notes.push({ t: 0.5, d: 0.4, g: 1, k: 'kick' });
+    notes.push({ t: 0.5, d: 1.2, g: 0.7, k: 'crash' });
+    [60, 64, 67, 72].forEach((m) => notes.push({ t: 0.5, f: hz(m), d: 1, g: 0.42, k: 'brass', a: 0.02 }));
+    notes.push({ t: 0.5, f: hz(48), d: 0.9, g: 0.6, k: 'bass' });
+    [84, 88, 91, 96].forEach((m, i) => notes.push({ t: 0.5 + i * 0.06, f: hz(m), d: 0.7, g: 0.3, k: 'bell' }));
+    return render(notes, 1.7, 1.6);
+  };
+  RECIPES.party = () => {
+    const beat = 60 / 140;
+    const notes = [];
+    const hit = (at, k, g, d) => notes.push({ t: at * beat, d, g, k });
+    for (let b = 0; b < 8; b++) {
+      hit(b, 'kick', 1, 0.35);
+      hit(b, 'hat', 0.18, 0.06);
+      hit(b + 0.5, 'hat', 0.35, 0.08);
+      if (b % 2 === 1) hit(b, 'clap', 0.7, 0.25);
+    }
+    // Bass nhảy quãng tám theo hợp âm Đô, Đô, Fa, Sol.
+    [48, 48, 48, 48, 53, 53, 55, 55].forEach((r, b) => {
+      notes.push({ t: b * beat, f: hz(r), d: beat * 0.45, g: 0.55, k: 'bass', a: 0.005 });
+      notes.push({ t: (b + 0.5) * beat, f: hz(r + 12), d: beat * 0.4, g: 0.45, k: 'bass', a: 0.005 });
+    });
+    // Kèn đánh vào nhịp nghịch.
+    const chords = [[60, 64, 67], [60, 64, 67], [60, 64, 67], [60, 64, 67], [60, 65, 69], [60, 65, 69], [62, 67, 71], [62, 67, 71]];
+    chords.forEach((chord, b) => chord.forEach((m) => notes.push({ t: (b + 0.5) * beat, f: hz(m), d: 0.16, g: 0.28, k: 'brass', a: 0.012 })));
+    // Giai điệu chuông vui đi lên.
+    const riff = [[0, 72], [0.5, 76], [1, 79], [1.5, 76], [2, 81], [2.5, 79], [3, 76], [3.5, 79], [4, 77], [4.5, 81], [5, 79], [5.5, 77], [6, 74], [6.5, 79], [7, 84]];
+    riff.forEach((step, i) => notes.push({ t: step[0] * beat, f: hz(step[1]), d: i === riff.length - 1 ? 0.9 : beat * 0.55, g: 0.6, k: 'bell' }));
+    // Cú chốt cuối.
+    hit(8, 'kick', 1, 0.4);
+    hit(8, 'crash', 0.7, 1.1);
+    [60, 64, 67, 72].forEach((m) => notes.push({ t: 8 * beat, f: hz(m), d: 0.9, g: 0.4, k: 'brass', a: 0.02 }));
+    notes.push({ t: 8 * beat, f: hz(48), d: 0.8, g: 0.6, k: 'bass' });
+    // Tiếng vỗ tay rộn ràng ở nền.
+    const total = 8 * beat + 1.1;
+    let seed = 99;
+    const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 110; i++) {
+      const t = 0.1 + rand() * (total - 0.4);
+      const fade = Math.max(0, Math.min(1, t / 0.5) * Math.min(1, (total - t) / 0.8));
+      notes.push({ t, d: 0.12, g: (0.06 + rand() * 0.1) * fade, k: 'clap' });
+    }
+    return render(notes, total, 1.8);
+  };
+
   const rendered = {};
   const sound = (name) => rendered[name] || (rendered[name] = RECIPES[name]());
 
@@ -675,6 +728,7 @@ button { cursor: pointer; }
     const opts = options || {};
     const limit = opts.limit || Infinity;
     const gain = opts.gain || 1;
+    const duck = opts.duck || 1;
     const c = getCtx();
     stopSource();
     const source = c.createBufferSource();
@@ -684,7 +738,12 @@ button { cursor: pointer; }
     volume.connect(master);
     const start = c.currentTime + 0.03;
     const length = Math.min(buffer.duration, limit);
-    volume.gain.setValueAtTime(gain, start);
+    volume.gain.setValueAtTime(gain * duck, start);
+    if (duck < 1) {
+      // Nhạc nhỏ đi trong lúc máy đọc lời khen, rồi to dần trở lại.
+      volume.gain.setValueAtTime(gain * duck, start + (opts.duckSeconds || 2));
+      volume.gain.linearRampToValueAtTime(gain, start + (opts.duckSeconds || 2) + 0.4);
+    }
     if (length < buffer.duration) {
       volume.gain.setValueAtTime(gain, start + length - 1.5);
       volume.gain.linearRampToValueAtTime(0, start + length);
@@ -763,8 +822,6 @@ button { cursor: pointer; }
     if ('speechSynthesis' in window && (speechSynthesis.speaking || speechSynthesis.pending)) speechSynthesis.cancel();
     clearPads();
     stopConfetti();
-    finishYouTube(false);
-    hideYouTube();
     if (previewId) { const id = previewId; previewId = null; markPreview(id, false); }
   }
 
@@ -776,7 +833,7 @@ button { cursor: pointer; }
     if (lastTap.kind === kind && now - lastTap.at < 600) return;
     lastTap = { kind, at: now };
     if (mode === 'reward') return;
-    if (kind === 'true') playReward(false);
+    if (kind === 'true') celebrate();
     else sayFalse();
   }
 
@@ -821,114 +878,6 @@ button { cursor: pointer; }
     }
     lastPraise = praiseBags[lang].pop();
     return lastPraise;
-  }
-
-  /* ---------- YouTube ngay trong trò chơi (chỉ khi chạy ngoài claude.ai) ---------- */
-  let ytApi = null;
-  let ytPlayerReady = null;
-  let ytRun = null;
-
-  function loadYouTubeApi() {
-    if (ytApi) return ytApi;
-    ytApi = new Promise((resolve, reject) => {
-      if (window.YT && window.YT.Player) { resolve(window.YT); return; }
-      const guard = setTimeout(() => reject(new Error('youtube api timeout')), 8000);
-      window.onYouTubeIframeAPIReady = () => { clearTimeout(guard); resolve(window.YT); };
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      tag.onerror = () => { clearTimeout(guard); reject(new Error('youtube api failed')); };
-      document.head.appendChild(tag);
-    });
-    ytApi.catch(() => { ytApi = null; });
-    return ytApi;
-  }
-
-  function getYouTubePlayer() {
-    if (ytPlayerReady) return ytPlayerReady;
-    ytPlayerReady = loadYouTubeApi().then((YT) => new Promise((resolve, reject) => {
-      const guard = setTimeout(() => reject(new Error('youtube player timeout')), 10000);
-      // Dùng tên miền nocookie cho trẻ em: YouTube hạn chế theo dõi khi video được nhúng theo cách này.
-      new YT.Player('ytPlayer', {
-        host: 'https://www.youtube-nocookie.com',
-        width: '100%',
-        height: '100%',
-        playerVars: { playsinline: 1, rel: 0, fs: 0, origin: location.origin },
-        events: {
-          onReady: (event) => { clearTimeout(guard); resolve(event.target); },
-          onStateChange: (event) => youTubeStateChanged(event.data),
-          onError: () => finishYouTube(false)
-        }
-      });
-    }));
-    ytPlayerReady.catch(() => { ytPlayerReady = null; });
-    return ytPlayerReady;
-  }
-
-  function hideYouTube() {
-    $('ytHost').hidden = true;
-    $('reward').classList.remove('with-video');
-  }
-
-  function finishYouTube(played) {
-    const run = ytRun;
-    if (!run) return;
-    ytRun = null;
-    clearTimeout(run.hint);
-    clearInterval(run.tick);
-    try {
-      run.player.stopVideo();
-      run.player.setVolume(100);
-    } catch (e) { /* trình phát đã đóng */ }
-    hideYouTube();
-    run.resolve(played);
-  }
-
-  function youTubeStateChanged(state) {
-    const run = ytRun;
-    if (!run) return;
-    if (state === 0) { finishYouTube(true); return; }
-    if (state !== 1 || run.started) return;
-    run.started = true;
-    run.startedAt = performance.now();
-    clearTimeout(run.hint);
-    $('rewardSong').textContent = 'Đang phát: ' + run.song.name;
-    run.tick = setInterval(() => {
-      const elapsed = (performance.now() - run.startedAt) / 1000;
-      let share = 0;
-      if (run.limit < Infinity) {
-        share = elapsed / run.limit;
-        if (elapsed >= run.limit) { finishYouTube(true); return; }
-        // Giảm dần âm lượng ở 1,5 giây cuối để đoạn nhạc không tắt đột ngột.
-        if (run.limit - elapsed < 1.5) run.player.setVolume(Math.round(100 * (run.limit - elapsed) / 1.5));
-      } else {
-        const total = run.player.getDuration();
-        share = total ? run.player.getCurrentTime() / total : 0;
-      }
-      $('rewardBar').style.transform = 'scaleX(' + Math.min(1, share) + ')';
-    }, 200);
-  }
-
-  // Trả về true nếu đã phát xong, false nếu không phát được để trang chuyển sang nhạc có sẵn.
-  function playOnYouTube(song, limit, my) {
-    return new Promise((resolve) => {
-      $('ytHost').hidden = false;
-      $('reward').classList.add('with-video');
-      $('rewardSong').textContent = 'Đang mở: ' + song.name;
-      getYouTubePlayer().then((player) => {
-        if (my !== seq) { resolve(false); return; }
-        ytRun = { player, resolve, song, limit, started: false, startedAt: 0, tick: 0, hint: 0 };
-        // Một số máy chặn tự phát có tiếng: khi đó chỉ cần chạm vào video.
-        ytRun.hint = setTimeout(() => {
-          if (ytRun && !ytRun.started) $('rewardSong').textContent = 'Chạm vào video để phát: ' + song.name;
-        }, 3500);
-        player.unMute();
-        player.setVolume(100);
-        player.loadVideoById(song.youtube);
-      }).catch(() => {
-        hideYouTube();
-        resolve(false);
-      });
-    });
   }
 
   // Pháo giấy bắn từ hai góc dưới rồi rơi xuống trong khoảng 3 giây.
@@ -1010,66 +959,71 @@ button { cursor: pointer; }
     step();
   }
 
-  async function playReward(direct) {
+  // Bấm True: "ta-da!" có trống dồn, reo "It's true!", rồi nhạc tiệc tùng sôi động trong lúc khen.
+  async function celebrate() {
     unlock();
     cancelAll();
     const my = seq;
     const words = wordsNow();
-    const praise = direct ? '' : nextPraise();
-    $('rewardTitle').textContent = direct ? 'Nhạc của Dora' : words.yes;
-    $('rewardPraise').textContent = praise;
-    $('rewardPraise').hidden = !praise;
-    $('rewardSong').textContent = '';
-    $('rewardBar').style.transform = 'scaleX(0)';
-    $('rewardLink').hidden = true;
-    setMode('reward', direct ? '' : words.yes + ' ' + praise);
-    if (!direct) {
-      launchConfetti();
-      // Reo "It's true!" ngay trên nền nhạc mừng, khen tiếp, rồi mới phát bài hát.
-      const fanfare = playBuffer(sound('fanfare'));
-      await wait(400);
+    const praise = nextPraise();
+    const speaking = settings.voice !== 'none';
+    showReward(words.yes, praise, false);
+    setMode('reward', words.yes + ' ' + praise);
+    launchConfetti();
+    const tada = playBuffer(sound('tada'));
+    await wait(650);
+    if (my !== seq) return;
+    if (speaking) {
+      await speak(words.yes, words.lang, 'excited');
       if (my !== seq) return;
-      if (settings.voice !== 'none') {
-        await speak(words.yes, words.lang, 'excited');
-        if (my !== seq) return;
-        await speak(praise, words.lang, 'praise');
-        if (my !== seq) return;
-      }
-      await fanfare;
+    }
+    await tada;
+    if (my !== seq) return;
+    const party = playBuffer(sound('party'), speaking ? { duck: 0.45, duckSeconds: 2.2 } : {});
+    if (speaking) {
+      await speak(praise, words.lang, 'praise');
       if (my !== seq) return;
-      $('status').textContent = COPY.reward;
     }
-    const pick = takeReward();
-    if (CAN_EMBED && pick.link) {
-      const played = await playOnYouTube(pick.link, direct ? Infinity : (settings.clip || Infinity), my);
-      if (my !== seq) return;
-      if (played) {
-        setMode('idle', direct ? COPY.idle : COPY.next); setTimeout(prepareReward, 300);
-        return;
-      }
-    }
-    // Không nhúng được YouTube thì nhạc tự phát là file hoặc giai điệu có sẵn, kèm nút mở bài YouTube.
-    if (pick.link) {
-      $('rewardLink').href = youtubeUrl(pick.link.youtube);
-      $('rewardLinkText').textContent = 'Mở “' + pick.link.name + '” trên YouTube';
-      $('rewardLink').hidden = false;
-    }
-    $('rewardSong').textContent = 'Đang mở: ' + pick.music.name;
+    await party;
+    if (my !== seq) return;
+    setMode('idle', COPY.next);
+  }
+
+  // Nút Phát nhạc: phát một bài trong danh sách, không có lời khen.
+  async function playSong() {
+    unlock();
+    cancelAll();
+    const my = seq;
+    const song = chooseSong();
+    lastRewardId = song.id;
+    showReward('Nhạc của Dora', '', true);
+    setMode('reward');
+    $('rewardSong').textContent = 'Đang mở: ' + song.name;
     let buffer;
-    let caption = 'Đang phát: ' + pick.music.name;
+    let caption = 'Đang phát: ' + song.name;
     try {
-      buffer = await loadBuffer(pick.music);
+      buffer = await loadBuffer(song);
     } catch (e) {
       buffer = sound('melody');
       caption = 'Chưa mở được bài đã chọn, phát giai điệu có sẵn';
     }
     if (my !== seq) return;
     $('rewardSong').textContent = caption;
-    const done = playBuffer(buffer, { limit: direct ? Infinity : (settings.clip || Infinity), gain: 0.95 });
+    const done = playBuffer(buffer, { gain: 0.95 });
     trackProgress(my);
     await done;
     if (my !== seq) return;
-    setMode('idle', direct ? COPY.idle : COPY.next); setTimeout(prepareReward, 300);
+    setMode('idle');
+  }
+
+  function showReward(title, praise, withSong) {
+    $('rewardTitle').textContent = title;
+    $('rewardPraise').textContent = praise;
+    $('rewardPraise').hidden = !praise;
+    $('rewardSong').textContent = '';
+    $('rewardSong').hidden = !withSong;
+    $('rewardProgress').hidden = !withSong;
+    $('rewardBar').style.transform = 'scaleX(0)';
   }
 
   /* ---------- Kho bài hát ---------- */
@@ -1081,22 +1035,15 @@ button { cursor: pointer; }
     duration: Math.round(tuneSeconds(TUNE_BOOK[key])),
     tune: key
   })));
-  // Khi bài YouTube được chọn có giai điệu dân gian tương ứng thì tự phát đúng giai điệu đó.
-  const TUNE_FOR_VIDEO = { prCvGKoybNE: 'bingo', yCjJyiqpAuU: 'twinkle', YE7PiTwhTQk: 'mary', _6HzoUcx3eo: 'oldmac', '7otAJa3jui8': 'row' };
   const cloud = { db: null, assets: null, slow: false, broken: false };
   let cloudSongs = [];
-  let sharedSongs = [];
   let localSongs = [];
   let keepsLocally = true;
   let confirmId = null;
   let pendingFocus = '';
   const memoryBytes = new Map();
   const decoded = new Map();
-  let nextReward = null;
   let lastRewardId = null;
-  let lastLinkId = null;
-  let lastChosenId = null;
-  let tuneBag = [];
 
   const store = (function () {
     let opening = null;
@@ -1133,7 +1080,7 @@ button { cursor: pointer; }
     };
   })();
 
-  const allSongs = () => cloudSongs.concat(sharedSongs, localSongs);
+  const allSongs = () => cloudSongs.concat(localSongs);
 
   function decode(bytes) {
     return new Promise((resolve, reject) => {
@@ -1195,42 +1142,12 @@ button { cursor: pointer; }
     const pool = list.length > 1 ? list.filter((s) => s.id !== lastId) : list;
     return pool[Math.floor(Math.random() * pool.length)];
   }
-  function tuneFor(video) {
-    const matching = video && TUNE_FOR_VIDEO[video.youtube];
-    if (matching) return TUNES.find((t) => t.tune === matching);
-    if (!tuneBag.length) tuneBag = shuffled(TUNES).filter((t) => t.id !== lastRewardId);
-    return tuneBag.pop();
-  }
-  // Mỗi lần thưởng gồm nhạc tự phát (music) và, nếu có, một bài YouTube để mở thêm (link).
-  function chooseReward() {
+  // Bài đã chọn trong cài đặt, hoặc ngẫu nhiên trong file nhạc của bạn; chưa có file thì dùng giai điệu có sẵn.
+  function chooseSong() {
     const songs = allSongs();
-    const fixedTune = TUNES.find((t) => t.id === settings.reward);
-    if (fixedTune) return { music: fixedTune, link: null };
-    const fixed = songs.find((s) => s.id === settings.reward);
-    if (fixed && !fixed.youtube) return { music: fixed, link: null };
-    if (CAN_EMBED && !fixed && songs.length) {
-      const chosen = pickOther(songs, lastChosenId);
-      return chosen.youtube ? { music: tuneFor(chosen), link: chosen } : { music: chosen, link: null };
-    }
-    const files = songs.filter((s) => !s.youtube);
-    const videos = songs.filter((s) => s.youtube);
-    const link = fixed || (videos.length ? pickOther(videos, lastLinkId) : null);
-    if (files.length && !fixed) return { music: pickOther(files, lastRewardId), link };
-    return { music: tuneFor(link), link };
-  }
-  function prepareReward() {
-    if (!nextReward) nextReward = chooseReward();
-    if (!(CAN_EMBED && nextReward.link)) loadBuffer(nextReward.music).catch(() => {});
-  }
-  function takeReward() {
-    const known = (s) => !s || s.where === 'builtin' || allSongs().some((x) => x.id === s.id);
-    const usable = nextReward && known(nextReward.music) && known(nextReward.link);
-    const pick = usable ? nextReward : chooseReward();
-    nextReward = null;
-    lastRewardId = pick.music.id;
-    if (pick.link) lastLinkId = pick.link.id;
-    lastChosenId = (pick.link || pick.music).id;
-    return pick;
+    const fixed = TUNES.concat(songs).find((s) => s.id === settings.reward);
+    if (fixed) return fixed;
+    return pickOther(songs.length ? songs : TUNES, lastRewardId);
   }
 
   function userError(text) { const e = new Error(text); e.userText = text; return e; }
@@ -1262,55 +1179,6 @@ button { cursor: pointer; }
 
   function newLocalId() {
     return 'local-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
-  }
-
-  // Chỉ giữ mã video đã kiểm tra, rồi tự dựng link, nên không có link lạ nào lọt vào trang.
-  function parseYouTube(text) {
-    const raw = text.trim();
-    let url;
-    try {
-      url = new URL(/^https?:\/\//i.test(raw) ? raw : 'https://' + raw);
-    } catch (e) {
-      return null;
-    }
-    const host = url.hostname.toLowerCase().replace(/^(www|m|music)\./, '');
-    let id = null;
-    if (host === 'youtu.be') {
-      id = url.pathname.split('/')[1];
-    } else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
-      id = url.searchParams.get('v');
-      if (!id) {
-        const match = url.pathname.match(/^\/(?:shorts|embed|live)\/([^/]+)/);
-        if (match) id = match[1];
-      }
-    }
-    return id && YOUTUBE_ID.test(id) ? id : null;
-  }
-
-  function youtubeUrl(id) {
-    return 'https://www.youtube.com/watch?v=' + id;
-  }
-
-  async function addYouTube(link, givenName) {
-    const id = parseYouTube(link);
-    if (!id) throw userError('Link này không phải một bài trên YouTube. Hãy dán link dạng youtube.com/watch?v=... hoặc youtu.be/...');
-    await cloudReady;
-    const songs = allSongs();
-    if (songs.some((s) => s.youtube === id)) throw userError('Bài này đã có trong danh sách.');
-    const count = songs.filter((s) => s.youtube).length;
-    const meta = { name: (givenName.trim() || 'Bài YouTube ' + (count + 1)).slice(0, 80), youtube: id, addedAt: Date.now() };
-    if (cloud.db && cloud.assets) {
-      const ref = cloud.db.collection('songs').doc();
-      await retryOnce(() => ref.set(meta), 'unavailable');
-      return;
-    }
-    const song = Object.assign({ id: newLocalId(), where: 'local' }, meta);
-    try {
-      await store.putSong(song);
-    } catch (e) {
-      keepsLocally = false;
-    }
-    localSongs.push(song);
   }
 
   async function addOne(file) {
@@ -1372,7 +1240,6 @@ button { cursor: pointer; }
         problems.push(files[i].name + ': ' + explain(e));
       }
     }
-    nextReward = null;
     renderWhere();
     renderSongs();
     if (problems.length) showMessage(problems.join('\n'), true);
@@ -1398,7 +1265,6 @@ button { cursor: pointer; }
     }
     decoded.delete(song.id);
     if (settings.reward === song.id) { settings.reward = 'random'; saveSettings(); }
-    nextReward = null;
     confirmId = null;
     renderSongs();
   }
@@ -1456,30 +1322,19 @@ button { cursor: pointer; }
   }
 
   function canDelete(song) {
-    if (song.where === 'builtin' || song.where === 'shared') return false;
+    if (song.where === 'builtin') return false;
     return song.where === 'local' || !!(cloud.db && cloud.assets);
   }
 
   function songRow(song) {
     const row = document.createElement('li');
     row.className = 'song';
-    if (song.youtube) {
-      const open = document.createElement('a');
-      open.className = 'song-play';
-      open.href = youtubeUrl(song.youtube);
-      open.target = '_blank';
-      open.rel = 'noopener noreferrer';
-      open.setAttribute('aria-label', 'Mở ' + song.name + ' trên YouTube');
-      open.appendChild(icon('i-open'));
-      row.appendChild(open);
-    } else {
-      const playing = previewId === song.id;
-      const play = button('song-play', '', () => previewSong(song), 'play:' + song.id);
-      play.dataset.name = song.name;
-      play.setAttribute('aria-label', (playing ? 'Dừng ' : 'Nghe thử ') + song.name);
-      play.appendChild(icon(playing ? 'i-stop' : 'i-play'));
-      row.appendChild(play);
-    }
+    const playing = previewId === song.id;
+    const play = button('song-play', '', () => previewSong(song), 'play:' + song.id);
+    play.dataset.name = song.name;
+    play.setAttribute('aria-label', (playing ? 'Dừng ' : 'Nghe thử ') + song.name);
+    play.appendChild(icon(playing ? 'i-stop' : 'i-play'));
+    row.appendChild(play);
 
     const info = document.createElement('div');
     info.className = 'song-info';
@@ -1488,7 +1343,7 @@ button { cursor: pointer; }
     name.textContent = song.name;
     const meta = document.createElement('span');
     meta.className = 'song-meta';
-    const labels = song.youtube ? ['YouTube'] : [formatTime(song.duration)];
+    const labels = [formatTime(song.duration)];
     if (song.where === 'builtin') labels.push('Có sẵn');
     if (song.where === 'local') labels.push('Chỉ trên máy này');
     meta.textContent = labels.join(' · ');
@@ -1598,8 +1453,6 @@ button { cursor: pointer; }
   }
 
   function syncForm() {
-    const clip = document.querySelector('input[name="clip"][value="' + Number(settings.clip) + '"]');
-    if (clip) clip.checked = true;
     const voice = document.querySelector('input[name="voice"][value="' + (WORDS[settings.voice] || settings.voice === 'none' ? settings.voice : 'en') + '"]');
     if (voice) voice.checked = true;
   }
@@ -1620,7 +1473,7 @@ button { cursor: pointer; }
       cloudSongs = snapshot.docs
         .filter((d) => d.exists)
         .map((d) => Object.assign({}, d.data(), { id: d.id, where: 'cloud' }))
-        .filter((s) => typeof s.name === 'string' && (YOUTUBE_ID.test(String(s.youtube)) || ASSET_ID.test(String(s.assetId))));
+        .filter((s) => typeof s.name === 'string' && !s.youtube && ASSET_ID.test(String(s.assetId)));
       if (!snapshot.metadata.fromCache) {
         clearTimeout(slowTimer);
         if (cloud.slow) { cloud.slow = false; renderWhere(); }
@@ -1632,22 +1485,6 @@ button { cursor: pointer; }
       cloud.broken = true;
       renderWhere();
     });
-  }
-
-  // Ở địa chỉ riêng, danh sách chung nằm trong file songs.json đi kèm trang.
-  async function loadSharedSongs() {
-    if (!CAN_EMBED) return;
-    $('ytHelp').textContent = 'Bài YouTube phát ngay trong trò chơi. Nếu máy chặn tự phát, chỉ cần chạm vào video.';
-    try {
-      const response = await fetch('songs.json', { cache: 'no-store' });
-      if (!response.ok) return;
-      const rows = await response.json();
-      sharedSongs = rows
-        .filter((r) => r && typeof r.name === 'string' && YOUTUBE_ID.test(String(r.youtube)))
-        .map((r) => ({ id: 'shared-' + r.youtube, name: r.name.slice(0, 80), youtube: r.youtube, where: 'shared', addedAt: 0 }));
-      nextReward = null;
-      renderSongs();
-    } catch (e) { /* không có danh sách chung thì dùng bài trên máy */ }
   }
 
   async function loadLocalSongs() {
@@ -1677,7 +1514,7 @@ button { cursor: pointer; }
     pad.addEventListener('contextmenu', (event) => event.preventDefault());
   });
 
-  $('coachSong').addEventListener('click', () => playReward(true));
+  $('coachSong').addEventListener('click', () => playSong());
   $('stopBtn').addEventListener('click', () => { cancelAll(); setMode('idle'); });
 
   const sheet = $('sheet');
@@ -1696,36 +1533,9 @@ button { cursor: pointer; }
     const picked = event.target.files;
     addFiles(picked).finally(() => { event.target.value = ''; });
   });
-  $('ytForm').addEventListener('submit', async (event) => {
-    event.preventDefault();
-    if ($('ytAdd').disabled) return;
-    $('ytAdd').disabled = true;
-    try {
-      await addYouTube($('ytUrl').value, $('ytName').value);
-      $('ytUrl').value = '';
-      $('ytName').value = '';
-      nextReward = null;
-      renderSongs();
-      showMessage('Đã thêm link YouTube.');
-    } catch (e) {
-      showMessage(explain(e), true);
-    }
-    $('ytAdd').disabled = false;
-  });
-  $('rewardLink').addEventListener('click', () => {
-    // Dừng nhạc ngay để không chồng tiếng với YouTube; đợi một nhịp rồi mới đóng màn để link kịp mở.
-    cancelAll();
-    setTimeout(() => {
-      if (mode === 'reward') setMode('idle', COPY.next);
-    }, 400);
-  });
   $('rewardPick').addEventListener('change', (event) => {
     settings.reward = event.target.value;
-    nextReward = null;
     saveSettings();
-  });
-  document.querySelectorAll('input[name="clip"]').forEach((input) => {
-    input.addEventListener('change', () => { settings.clip = Number(input.value); saveSettings(); });
   });
   document.querySelectorAll('input[name="voice"]').forEach((input) => {
     input.addEventListener('change', () => {
@@ -1756,7 +1566,6 @@ button { cursor: pointer; }
   renderSongs();
   renderWhere();
   loadLocalSongs();
-  loadSharedSongs();
   cloudReady = connectCloud();
 })();
 </script>
