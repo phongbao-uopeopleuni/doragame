@@ -134,6 +134,17 @@ button { cursor: pointer; }
   pointer-events: none;
 }
 .pad.sounding::after { animation-delay: .38s; }
+/* Nút vừa bấm sai lắc nhẹ cùng tiếng "uh-oh"; sau khung động viên, hai nút nhún mời Dora chọn lại. */
+.pad.shake { animation: shake .45s cubic-bezier(.36, .07, .19, .97); }
+@keyframes shake {
+  15%, 85% { transform: translateX(-3px); }
+  30%, 70% { transform: translateX(7px); }
+  45%, 55% { transform: translateX(-9px); }
+  50% { transform: translateX(9px); }
+}
+.pads.invite .pad { animation: invite .55s cubic-bezier(.3, 1.5, .5, 1) 2; }
+.pads.invite .pad-false { animation-delay: .14s; }
+@keyframes invite { 0%, 100% { transform: none; } 40% { transform: translateY(-9px) scale(1.02); } }
 @keyframes ring {
   from { transform: translate(-50%, -50%) scale(.5); opacity: .75; }
   to { transform: translate(-50%, -50%) scale(3.4); opacity: 0; }
@@ -176,6 +187,15 @@ button { cursor: pointer; }
   --scene-ray: rgba(255, 255, 255, .4); --buddy: #FFC52E; --title-shadow: #FFFFFF;
   --fx-colors: #FFC52E, #2F80ED, #FFFFFF, #00B48F, #FF6B3D;
 }
+/* Khung động viên khi bấm False: màu đào dịu cùng họ với nút False, không tia nắng, không ồn ào. */
+.reward[data-scene="peach"] {
+  --scene-bg: #FFD9C7; --scene-ink: #4A1A0B; --scene-edge: #E9A487;
+  --scene-ray: transparent; --buddy: #FFC52E; --title-shadow: #FFFFFF;
+  --fx-colors: #FFC52E, #FFFFFF, #FF8A5B, #2F80ED;
+}
+.reward[data-scene="peach"] .rays { display: none; }
+/* Ở khung này ngôi sao là nhân vật chính truyền cảm xúc, nên to hơn để bé đọc được nét mặt. */
+.reward[data-scene="peach"] .buddy-wrap { width: clamp(84px, min(26vmin, 21vh), 180px); }
 .reward.enter { animation: panel-in .4s cubic-bezier(.2, 1.35, .4, 1) both; transform-origin: var(--ox, 50%) var(--oy, 25%); }
 @keyframes panel-in { from { transform: scale(.82); opacity: .4; } to { transform: none; opacity: 1; } }
 .reward.jolt { animation: jolt .34s cubic-bezier(.3, .6, .4, 1); }
@@ -226,6 +246,20 @@ button { cursor: pointer; }
 .reward[data-move="wiggle"] .buddy { animation: b-wiggle .6s ease-in-out infinite; }
 @keyframes b-wiggle { 0%, 100% { transform: rotate(-14deg); } 50% { transform: rotate(14deg) scale(1.06); } }
 .reward[data-move="spin"] .buddy { animation: b-spin 1.5s cubic-bezier(.7, 0, .3, 1) infinite; }
+/* Bấm False: sao lắc đầu "ồ, chưa đúng" với mặt ngơ ngác, rồi tươi lên và nhảy hai cái để cổ vũ. */
+.reward[data-move="oops"] .buddy { animation: b-oops .8s ease-in-out .15s both; }
+@keyframes b-oops {
+  20% { transform: rotate(-12deg); }
+  40% { transform: rotate(10deg); }
+  60% { transform: rotate(-7deg); }
+  80% { transform: rotate(4deg); }
+  100% { transform: translateY(5%); }
+}
+.reward[data-move="cheer"] .buddy { transform-origin: 50% 100%; animation: b-jump .3s cubic-bezier(.33, 0, .67, 1) 4 alternate; }
+.reward:not([data-face="oops"]) .face-oops,
+.reward[data-face="oops"] .face-happy { display: none; }
+.b-brow { fill: none; stroke: #2B1C05; stroke-width: 3.5; stroke-linecap: round; }
+.b-mouth { fill: #2B1C05; }
 @keyframes b-spin {
   0%, 35% { transform: rotate(0) scale(1); }
   70% { transform: rotate(200deg) scale(1.14); }
@@ -251,6 +285,9 @@ button { cursor: pointer; }
   animation: ch-pop .5s cubic-bezier(.2, 1.7, .4, 1) calc(var(--i) * 40ms) both,
     ch-wave 1.2s ease-in-out calc(.7s + var(--i) * 80ms) infinite;
 }
+.reward[data-title="soft"] .ch { animation: ch-soft .5s cubic-bezier(.3, 1.3, .5, 1) calc(var(--i) * 35ms) both; }
+@keyframes ch-soft { from { transform: translateY(-35%); opacity: 0; } to { transform: none; } }
+#rewardPraise.pop-in { animation: pop .45s cubic-bezier(.2, 1.6, .4, 1); }
 @keyframes ch-pop { from { transform: scale(0) rotate(-25deg); opacity: 0; } 60% { opacity: 1; } to { transform: none; } }
 @keyframes ch-drop { from { transform: translateY(-160%) rotate(-12deg); opacity: 0; } 30% { opacity: 1; } to { transform: none; } }
 @keyframes ch-stretch { from { transform: scale(.3, 0); } to { transform: none; } }
@@ -387,6 +424,7 @@ button { cursor: pointer; }
   .reward { padding: 8px 12px; gap: 6px; }
   .reward-body { gap: 6px; }
   .buddy-wrap { display: none; }
+  .reward[data-scene="peach"] .buddy-wrap { display: block; width: 64px; }
   .stop { min-height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -395,6 +433,7 @@ button { cursor: pointer; }
   .note { display: none; }
   .pad.sounding::before, .pad.sounding::after { animation: none; transform: translate(-50%, -50%) scale(1.8); opacity: .5; }
   .pad.sounding::after { display: none; }
+  .pad.shake, .pads.invite .pad, #rewardPraise.pop-in { animation: none; }
 }
 </style>
 
@@ -403,6 +442,7 @@ button { cursor: pointer; }
   <symbol id="i-sound" viewBox="0 0 24 24"><path fill="currentColor" d="M4 9.5v5h3.5L12 19V5L7.5 9.5z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.8 7.8 0 0 1 0 11"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.2v13.6L19.5 12z"/></symbol>
   <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2" fill="currentColor"/></symbol>
+  <symbol id="i-retry" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3L19.5 8.4M19.5 3.8v4.6h-4.6"/></symbol>
   <defs><path id="star-shape" d="M50 6 L63.5 35.4 L95.7 39.2 L71.9 61.1 L78.2 92.8 L50 77 L21.8 92.8 L28.1 61.1 L4.3 39.2 L36.5 35.4 Z"/></defs>
 </svg>
 
@@ -450,11 +490,20 @@ button { cursor: pointer; }
           <svg class="buddy" viewBox="-6 -6 116 116">
             <use class="b-shadow" href="#star-shape" x="4" y="7"/>
             <use class="b-body" href="#star-shape"/>
-            <ellipse class="b-eye" cx="41" cy="50" rx="4.5" ry="6"/>
-            <ellipse class="b-eye" cx="59" cy="50" rx="4.5" ry="6"/>
             <circle class="b-cheek" cx="35" cy="61" r="4.5"/>
             <circle class="b-cheek" cx="65" cy="61" r="4.5"/>
-            <path class="b-smile" d="M43 60 Q50 68 57 60"/>
+            <g class="face-happy">
+              <ellipse class="b-eye" cx="41" cy="50" rx="4.5" ry="6"/>
+              <ellipse class="b-eye" cx="59" cy="50" rx="4.5" ry="6"/>
+              <path class="b-smile" d="M43 60 Q50 68 57 60"/>
+            </g>
+            <g class="face-oops">
+              <path class="b-brow" d="M34 42 L45 37.5"/>
+              <path class="b-brow" d="M66 42 L55 37.5"/>
+              <circle class="b-eye" cx="41" cy="49" r="4"/>
+              <circle class="b-eye" cx="59" cy="49" r="4"/>
+              <ellipse class="b-mouth" cx="50" cy="63" rx="3.6" ry="4.6"/>
+            </g>
           </svg>
         </div>
         <h2 id="rewardTitle">It's true!</h2>
@@ -463,7 +512,7 @@ button { cursor: pointer; }
         <div id="rewardProgress" class="progress" aria-hidden="true"><i id="rewardBar"></i></div>
         <div class="reward-actions">
           <button id="stopBtn" class="stop" type="button">
-            <svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg>Dừng nhạc
+            <svg class="icon" aria-hidden="true"><use id="stopIcon" href="#i-stop"/></svg><span id="stopText">Dừng nhạc</span>
           </button>
         </div>
       </div>
@@ -520,7 +569,7 @@ button { cursor: pointer; }
         <li>Hỏi Dora một câu, ví dụ: “Đây là con mèo phải không?”</li>
         <li>Bấm True: máy reo “It's true!” rồi khen Dora. Mỗi lần là một cảnh khác nhau với nhạc riêng: pháo giấy, bóng bay, pháo hoa, mưa sao hoặc bóng nảy.</li>
         <li>Trong lúc ăn mừng, Dora chạm vào màn hình để bóp bóng bay, bắn pháo hoa, rắc sao hoặc làm bóng nảy lên.</li>
-        <li>Bấm False: máy đọc nhẹ nhàng “It's false.”, không phát nhạc.</li>
+        <li>Bấm False: nút lắc nhẹ với tiếng “uh-oh” để Dora biết mình chọn chưa đúng, máy đọc “It's false.” rồi ngôi sao động viên Dora chọn lại. Lần True ngay sau đó được khen vì đã cố gắng.</li>
         <li>Muốn nghe bài hát, bấm Phát nhạc ở trên.</li>
       </ol>
     </section>
@@ -542,7 +591,8 @@ button { cursor: pointer; }
   const COPY = {
     idle: 'Hỏi Dora một câu, rồi bấm True hoặc False.',
     reward: 'Đang phát nhạc cho Dora.',
-    next: 'Giỏi lắm! Hỏi Dora câu tiếp theo nhé.'
+    next: 'Giỏi lắm! Hỏi Dora câu tiếp theo nhé.',
+    retry: 'Cố lên! Dora chọn lại đáp án nào.'
   };
   const WORDS = {
     en: { true: 'True', false: 'False', yes: 'It\'s true!', no: 'It\'s false.', lang: 'en-US' },
@@ -554,6 +604,16 @@ button { cursor: pointer; }
       'Hooray for Dora!', 'Yay, Dora!', 'You are so smart!', 'High five, Dora!'],
     vi: ['Con giỏi quá!', 'Dora giỏi quá!', 'Giỏi lắm, Dora!', 'Tuyệt vời!', 'Hoan hô Dora!', 'Con làm tốt lắm!',
       'Siêu quá, Dora!', 'Dora thông minh quá!', 'Tuyệt cú mèo!', 'Cừ lắm, Dora!', 'Tuyệt quá, Dora!', 'Dora làm được rồi!']
+  };
+  // Sau khi bấm False: động viên chọn lại, không chê.
+  const ENCOURAGE = {
+    en: ['Try again, Dora!', 'You can do it!', 'Let\'s try again!', 'Think again, Dora!', 'One more try!', 'Keep going, Dora!'],
+    vi: ['Thử lại nào, Dora!', 'Con làm được mà!', 'Mình thử lại nhé!', 'Nghĩ lại nào, Dora!', 'Cố lên, Dora!', 'Thêm một lần nữa nào!']
+  };
+  // True ngay sau một lần False: khen sự cố gắng, để lần sau Dora vẫn muốn thử tiếp.
+  const RETRY_PRAISE = {
+    en: ['You kept trying! Great job!', 'You tried again and got it!', 'You never give up! Well done!', 'Trying again worked! Yay, Dora!'],
+    vi: ['Con đã cố gắng, giỏi quá!', 'Thử lại là làm được, giỏi lắm!', 'Dora không bỏ cuộc, tuyệt vời!', 'Cố gắng thật giỏi, hoan hô Dora!']
   };
 
   /* ---------- Cài đặt: mỗi máy tự nhớ ---------- */
@@ -923,12 +983,19 @@ button { cursor: pointer; }
   }
 
   const RECIPES = {
-    // True: chuông sáng đi lên. False: tiếng gỗ tròn, trầm hơn, đi xuống, không chói.
+    // True: chuông sáng đi lên.
     true: () => render([72, 76, 79, 84].map((m, i) => ({ t: i * 0.11, f: hz(m), d: 0.85, g: 1, k: 'bell' })), 1.2),
+    // False: "uh-oh" hai nốt gỗ ấm, đi xuống một quãng ba thứ, nốt sau trĩu xuống như tiếng "ồ".
+    // Lần nào cũng đúng tiếng này để Dora quen tai: nghe là biết mình chọn chưa đúng. Không chói, không chê.
     false: () => render([
-      { t: 0, f: hz(67), d: 0.45, g: 1, k: 'wood', a: 0.012, s: 0.12 },
-      { t: 0.27, f: hz(62), d: 0.7, g: 1, k: 'wood', a: 0.012, s: 0.12 }
+      { t: 0, f: hz(69), d: 0.2, g: 1, k: 'wood', a: 0.008 },
+      { t: 0.01, f: hz(57), d: 0.2, g: 0.35, k: 'soft', a: 0.01 },
+      { t: 0.24, f: hz(66), d: 0.62, g: 1, k: 'wood', a: 0.012, s: 0.2 },
+      { t: 0.25, f: hz(54), d: 0.58, g: 0.35, k: 'soft', a: 0.02, s: 0.2 }
     ], 1),
+    // Lấy lại tinh thần: bốn nốt chuông đi lên như "cố lên nào!".
+    cheerUp: () => render([67, 72, 76, 79].map((m, i) => ({ t: i * 0.09, f: hz(m), d: 0.6, g: 0.8, k: 'bell' }))
+      .concat([{ t: 0.27, f: hz(48), d: 0.55, g: 0.35, k: 'soft', a: 0.02 }]), 1),
     melody: () => {
       const beat = 0.46;
       const tune = [[67, 1], [69, 0.5], [72, 0.5], [76, 1], [72, 1], [74, 1], [72, 0.5], [69, 0.5], [67, 2],
@@ -1307,12 +1374,14 @@ button { cursor: pointer; }
   function setMode(next, message) {
     mode = next;
     $('status').textContent = message || COPY[next];
-    $('reward').hidden = next !== 'reward';
-    $('stage').classList.toggle('rewarding', next === 'reward');
+    const panel = next === 'reward' || next === 'oops';
+    $('reward').hidden = !panel;
+    $('stage').classList.toggle('rewarding', panel);
   }
 
   function clearPads() {
-    Object.values(PADS).forEach((pad) => pad.classList.remove('sounding'));
+    Object.values(PADS).forEach((pad) => pad.classList.remove('sounding', 'shake'));
+    document.querySelector('.pads').classList.remove('invite');
   }
 
   // Chữ và giọng theo cài đặt; khi chọn không đọc thì vẫn hiện chữ tiếng Anh.
@@ -1327,7 +1396,7 @@ button { cursor: pointer; }
     if (previewId) { const id = previewId; previewId = null; markPreview(id, false); }
   }
 
-  // Bấm True là thưởng ngay; bấm False chỉ đọc nhẹ nhàng.
+  // Bấm True là thưởng ngay; bấm False là báo chưa đúng rồi động viên chọn lại.
   let lastTap = { kind: null, at: 0 };
   function tapPad(kind) {
     unlock();
@@ -1339,20 +1408,84 @@ button { cursor: pointer; }
     else sayFalse();
   }
 
-  // False: tiếng gỗ trầm rồi đọc nhẹ nhàng, không khen và không phát nhạc.
+  /* False: nút vừa bấm lắc nhẹ với tiếng "uh-oh" để Dora nhận ra mình chọn chưa đúng. Rồi khung động viên:
+     sao ngơ ngác, máy đọc "It's false." nhẹ nhàng, sao tươi lên cổ vũ chọn lại, và hai nút nhún mời bấm lại. */
+  const OOPS_LOOK = { look: 'peach', title: 'soft', move: 'oops', face: 'oops', fx: 'encourage', action: 'retry', origin: 'false' };
+  let triedAt = 0;
+  const langKey = () => (settings.voice === 'vi' ? 'vi' : 'en');
+  function pickFresh(list, last) {
+    const pool = list.filter((item) => item !== last);
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  let lastEncourage = '';
+  function nextEncourage() {
+    lastEncourage = pickFresh(ENCOURAGE[langKey()], lastEncourage);
+    return lastEncourage;
+  }
+  let lastRetryPraise = '';
+  function nextRetryPraise() {
+    lastRetryPraise = pickFresh(RETRY_PRAISE[langKey()], lastRetryPraise);
+    return lastRetryPraise;
+  }
+
   async function sayFalse() {
     cancelAll();
     const my = seq;
     const words = wordsNow();
+    const cheer = nextEncourage();
+    const speaking = settings.voice !== 'none';
+    triedAt = Date.now();
+    buzz([40, 70, 40]);
     setMode('idle', words.no);
-    PADS.false.classList.add('sounding');
-    await playBuffer(sound('false'));
+    PADS.false.classList.add('sounding', 'shake');
+    const uhOh = playBuffer(sound('false'));
+    await wait(480);
     if (my !== seq) return;
-    if (settings.voice !== 'none') {
-      await speak(words.no, words.lang, 'calm');
+    PADS.false.classList.remove('sounding', 'shake');
+    // Chừa sẵn chỗ cho câu động viên để chữ không bị xô khi câu hiện ra.
+    showReward(words.no, cheer, false, OOPS_LOOK);
+    $('rewardPraise').style.visibility = 'hidden';
+    setMode('oops', words.no);
+    fxStart(OOPS_LOOK, null);
+    await uhOh;
+    if (my !== seq) return;
+    // Mỗi bước có thời gian tối thiểu, để máy thiếu giọng đọc vẫn kịp cho Dora thấy nét mặt và câu động viên.
+    await Promise.all([speaking ? speak(words.no, words.lang, 'calm') : null, wait(700)]);
+    if (my !== seq) return;
+    // Sao tươi lên, nhảy và cổ vũ.
+    const box = $('reward');
+    box.dataset.face = 'happy';
+    box.dataset.move = 'cheer';
+    const line = $('rewardPraise');
+    line.style.visibility = '';
+    line.classList.remove('pop-in');
+    void line.offsetWidth;
+    line.classList.add('pop-in');
+    $('status').textContent = words.no + ' ' + cheer;
+    playBuffer(sound('cheerUp'));
+    if (fx.on && FX.encourage.boost) FX.encourage.boost();
+    await Promise.all([speaking ? speak(cheer, words.lang, 'praise') : null, wait(1600)]);
+    if (my !== seq) return;
+    await wait(500);
+    if (my !== seq) return;
+    fxFinish();
+    if (!reduceMotion()) {
+      box.classList.add('leaving');
+      await wait(260);
       if (my !== seq) return;
     }
-    PADS.false.classList.remove('sounding');
+    setMode('idle', COPY.retry);
+    invitePads();
+  }
+
+  let inviteTimer = 0;
+  function invitePads() {
+    const pads = document.querySelector('.pads');
+    pads.classList.remove('invite');
+    void pads.offsetWidth;
+    pads.classList.add('invite');
+    clearTimeout(inviteTimer);
+    inviteTimer = setTimeout(() => pads.classList.remove('invite'), 1400);
   }
 
   // Xáo cả bộ lời khen rồi rút dần: dùng hết một lượt mới lặp, và không lặp ngay lời vừa nói.
@@ -1696,6 +1829,20 @@ button { cursor: pointer; }
   }
 
   const FX = {
+    // Khung động viên: yên lặng lúc "uh-oh", rồi sao nhỏ bay vút lên khi ngôi sao cổ vũ tươi lại.
+    encourage: {
+      start() {},
+      boost() {
+        const c = buddyCenter();
+        ring(c.x, c.y, 34, fx.ink);
+        for (let i = 0; i < 12; i++) {
+          addPart({
+            k: 'star', x: c.x + rnd(-30, 30), y: c.y, vx: rnd(-170, 170), vy: -fx.h * rnd(0.35, 0.6),
+            r: rnd(8, 15), rot: rnd(0, TAU), spin: rnd(-3, 3), age: 0, life: rnd(1.4, 2), color: pick(fx.colors), g: -fx.h * 0.05
+          });
+        }
+      }
+    },
     confetti: {
       start() { cornerBurst(1); },
       hit() {
@@ -2016,7 +2163,10 @@ button { cursor: pointer; }
     const my = seq;
     const scene = takeScene();
     const words = wordsNow();
-    const praise = nextPraise();
+    // Vừa bấm False trong mấy phút trước rồi mới đúng: khen sự cố gắng thay vì lời khen thường.
+    const retried = triedAt && Date.now() - triedAt < 3 * 60 * 1000;
+    triedAt = 0;
+    const praise = retried ? nextRetryPraise() : nextPraise();
     const speaking = settings.voice !== 'none';
     showReward(words.yes, praise, false, scene);
     setMode('reward', words.yes + ' ' + praise);
@@ -2115,11 +2265,16 @@ button { cursor: pointer; }
     box.dataset.scene = look.look;
     box.dataset.title = look.title;
     box.dataset.move = look.move;
+    box.dataset.face = look.face || 'happy';
     box.classList.toggle('is-song', !!withSong);
     box.classList.remove('leaving', 'jolt', 'enter');
-    // Khung thưởng phồng ra từ chỗ nút True, như thể nút vừa bung ra.
+    // Khung động viên có nút Thử lại; khung thưởng và khung nhạc có nút Dừng nhạc.
+    const retry = look.action === 'retry';
+    $('stopIcon').setAttribute('href', retry ? '#i-retry' : '#i-stop');
+    $('stopText').textContent = retry ? 'Thử lại' : 'Dừng nhạc';
+    // Khung phồng ra từ chỗ nút vừa bấm, như thể nút vừa bung ra.
     const stage = $('stage').getBoundingClientRect();
-    const from = scene ? PADS.true.getBoundingClientRect() : null;
+    const from = scene ? PADS[look.origin === 'false' ? 'false' : 'true'].getBoundingClientRect() : null;
     box.style.setProperty('--ox', from && stage.width ? ((from.left + from.width / 2 - stage.left) / stage.width * 100) + '%' : '50%');
     box.style.setProperty('--oy', from && stage.height ? ((from.top + from.height / 2 - stage.top) / stage.height * 100) + '%' : '0%');
     void box.offsetWidth;
@@ -2127,6 +2282,8 @@ button { cursor: pointer; }
     setTitle(title, !withSong);
     $('rewardPraise').textContent = praise;
     $('rewardPraise').hidden = !praise;
+    $('rewardPraise').style.visibility = '';
+    $('rewardPraise').classList.remove('pop-in');
     $('rewardSong').textContent = '';
     $('rewardSong').hidden = !withSong;
     $('rewardProgress').hidden = !withSong;
@@ -2631,7 +2788,13 @@ button { cursor: pointer; }
   window.addEventListener('resize', () => { if (fx.on) sizeCanvas(); });
 
   $('coachSong').addEventListener('click', () => playSong());
-  $('stopBtn').addEventListener('click', () => { cancelAll(); setMode('idle'); });
+  // Trên khung động viên, nút này là "Thử lại": về ngay hai nút và mời Dora chọn lại.
+  $('stopBtn').addEventListener('click', () => {
+    const wasOops = mode === 'oops';
+    cancelAll();
+    setMode('idle', wasOops ? COPY.retry : undefined);
+    if (wasOops) invitePads();
+  });
 
   const sheet = $('sheet');
   $('openSheet').addEventListener('click', () => {
@@ -2664,7 +2827,7 @@ button { cursor: pointer; }
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-      const wasReward = mode === 'reward';
+      const wasReward = mode === 'reward' || mode === 'oops';
       cancelAll();
       if (wasReward) setMode('idle');
     } else if (armed) {
@@ -2686,7 +2849,7 @@ button { cursor: pointer; }
   // Dựng sẵn tiếng của cảnh đầu tiên khi trang vừa tải xong; âm thanh vẫn chỉ phát sau lần chạm đầu.
   setTimeout(() => {
     if (!armed) prepareScene(SCENES[peekScene()]);
-    if (getWorker()) soundAsync('false');
+    if (getWorker()) ['false', 'cheerUp'].forEach((name) => soundAsync(name));
   }, 1200);
 })();
 </script>
