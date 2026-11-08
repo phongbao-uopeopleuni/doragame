@@ -139,37 +139,140 @@ button { cursor: pointer; }
   to { transform: translate(-50%, -50%) scale(3.4); opacity: 0; }
 }
 
-/* Phần thưởng */
+/* Phần thưởng: mỗi lần True là một cảnh khác nhau, kiểu sách dán hình in màu phẳng,
+   viền mực và bóng đổ cứng như hai nút loa. Màu pháo giấy của từng cảnh nằm trong --fx-colors. */
 .stage.rewarding .pads { visibility: hidden; }
 .reward {
-  position: absolute; inset: 0; z-index: 2; overflow: hidden;
+  --scene-bg: var(--sun); --scene-ink: var(--sun-ink); --scene-edge: #D69A00;
+  --scene-ray: rgba(255, 255, 255, .42); --buddy: #FFFFFF; --title-shadow: #FFFFFF;
+  --fx-colors: #008F72, #DE4A26, #2F80ED, #E8479B, #FFFFFF;
+  position: absolute; inset: 0 0 10px; z-index: 2; overflow: hidden;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 14px; padding: 20px; text-align: center;
   border-radius: clamp(28px, 6vmin, 52px);
-  background: var(--sun); color: var(--sun-ink);
+  background-color: var(--scene-bg);
+  background-image: radial-gradient(color-mix(in srgb, var(--scene-ink) 9%, transparent) 2.5px, transparent 3px);
+  background-size: 20px 20px;
+  color: var(--scene-ink);
+  box-shadow: 0 10px 0 var(--scene-edge);
 }
+.reward[data-scene="sky"] {
+  --scene-bg: #7CC8FF; --scene-ink: #0B2742; --scene-edge: #3F8FCF;
+  --scene-ray: rgba(255, 255, 255, .45); --buddy: #FFC52E; --title-shadow: #FFFFFF;
+  --fx-colors: #FFC52E, #E8479B, #DE4A26, #00A383, #FFFFFF;
+}
+.reward[data-scene="night"] {
+  --scene-bg: #16284A; --scene-ink: #FFFFFF; --scene-edge: #0A1630;
+  --scene-ray: rgba(255, 255, 255, .07); --buddy: #FFC52E; --title-shadow: #E8479B;
+  --fx-colors: #FFC52E, #FF6FB5, #5EC8FF, #7CF0C8, #FFFFFF, #FF8A5B;
+}
+.reward[data-scene="mint"] {
+  --scene-bg: #5FDDB4; --scene-ink: #06372B; --scene-edge: #25A77D;
+  --scene-ray: rgba(255, 255, 255, .42); --buddy: #FFC52E; --title-shadow: #FFFFFF;
+  --fx-colors: #FFC52E, #FFFFFF, #E8479B, #2F80ED, #DE4A26;
+}
+.reward[data-scene="pink"] {
+  --scene-bg: #FF8FC2; --scene-ink: #4A0B2B; --scene-edge: #D2558F;
+  --scene-ray: rgba(255, 255, 255, .4); --buddy: #FFC52E; --title-shadow: #FFFFFF;
+  --fx-colors: #FFC52E, #2F80ED, #FFFFFF, #00B48F, #FF6B3D;
+}
+.reward.enter { animation: panel-in .4s cubic-bezier(.2, 1.35, .4, 1) both; transform-origin: var(--ox, 50%) var(--oy, 25%); }
+@keyframes panel-in { from { transform: scale(.82); opacity: .4; } to { transform: none; opacity: 1; } }
+.reward.jolt { animation: jolt .34s cubic-bezier(.3, .6, .4, 1); }
+@keyframes jolt {
+  20% { transform: translate(-7px, 5px) rotate(-.7deg); }
+  45% { transform: translate(6px, -4px) rotate(.6deg); }
+  70% { transform: translate(-3px, 2px); }
+  100% { transform: none; }
+}
+.reward.leaving { animation: panel-out .26s ease-in both; }
+@keyframes panel-out { to { transform: scale(.9); opacity: 0; } }
+
+/* Tia nắng xoay chậm phía sau, mờ dần ra mép. */
+.rays {
+  position: absolute; left: 50%; top: 40%;
+  width: 200vmax; height: 200vmax; margin: -100vmax 0 0 -100vmax;
+  background: repeating-conic-gradient(var(--scene-ray) 0deg 7.5deg, transparent 7.5deg 15deg);
+  -webkit-mask-image: radial-gradient(circle closest-side, #000 6%, transparent 40%);
+  mask-image: radial-gradient(circle closest-side, #000 6%, transparent 40%);
+  animation: spin 26s linear infinite;
+  pointer-events: none;
+}
+.reward.is-song .rays { display: none; }
+@keyframes spin { to { transform: rotate(1turn); } }
+
+/* Ngôi sao nhỏ cổ vũ: sticker có viền mực và bóng đổ cứng, mỗi cảnh nhảy một kiểu. */
+.buddy-wrap {
+  position: relative; width: clamp(60px, min(16vmin, 15vh), 132px);
+  scale: calc(1 + var(--beat, 0) * .1);
+  animation: buddy-in .55s cubic-bezier(.2, 1.6, .4, 1) .05s both;
+}
+.reward.is-song .buddy-wrap { display: none; }
+@keyframes buddy-in { from { transform: scale(0) rotate(-40deg); } to { transform: none; } }
+.buddy { display: block; width: 100%; height: auto; overflow: visible; }
+.b-shadow { fill: var(--scene-edge); stroke: var(--scene-edge); stroke-width: 6; stroke-linejoin: round; }
+.b-body { fill: var(--buddy); stroke: var(--scene-ink); stroke-width: 6; stroke-linejoin: round; }
+.b-eye { fill: #2B1C05; }
+.b-smile { fill: none; stroke: #2B1C05; stroke-width: 4; stroke-linecap: round; }
+.b-cheek { fill: #FF7FA6; }
+.reward[data-move="jump"] .buddy { transform-origin: 50% 100%; animation: b-jump .46s cubic-bezier(.33, 0, .67, 1) infinite alternate; }
+@keyframes b-jump {
+  from { transform: translateY(0) scale(1.1, .88); }
+  30% { transform: translateY(-5%) scale(.95, 1.06); }
+  to { transform: translateY(-24%) scale(.98, 1.02); }
+}
+.reward[data-move="float"] .buddy { animation: b-float 1.6s ease-in-out infinite; }
+@keyframes b-float { 0%, 100% { transform: translateY(0) rotate(-7deg); } 50% { transform: translateY(-14%) rotate(7deg); } }
+.reward[data-move="wiggle"] .buddy { animation: b-wiggle .6s ease-in-out infinite; }
+@keyframes b-wiggle { 0%, 100% { transform: rotate(-14deg); } 50% { transform: rotate(14deg) scale(1.06); } }
+.reward[data-move="spin"] .buddy { animation: b-spin 1.5s cubic-bezier(.7, 0, .3, 1) infinite; }
+@keyframes b-spin {
+  0%, 35% { transform: rotate(0) scale(1); }
+  70% { transform: rotate(200deg) scale(1.14); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
 .reward h2 {
   position: relative; margin: 0;
   font: 800 clamp(40px, min(12vw, 11vh), 96px)/1.05 var(--font-display);
   text-wrap: balance;
-  animation: pop .45s cubic-bezier(.2, 1.6, .4, 1);
+  text-shadow: 0 5px 0 var(--title-shadow);
+  scale: calc(1 + var(--beat, 0) * .07);
 }
+.reward.is-song h2 { text-shadow: none; animation: pop .45s cubic-bezier(.2, 1.6, .4, 1); }
 @keyframes pop { from { transform: scale(.7); } to { transform: scale(1); } }
+/* Chữ "It's true!" bật ra từng chữ cái, mỗi cảnh một kiểu. */
+.word { display: inline-block; white-space: nowrap; }
+.ch { display: inline-block; animation: ch-pop .55s cubic-bezier(.2, 1.7, .4, 1) calc(var(--i) * 45ms) both; }
+.reward[data-title="drop"] .ch { animation: ch-drop .75s cubic-bezier(.25, 1.45, .45, 1) calc(var(--i) * 55ms) both; }
+.reward[data-title="stretch"] .ch { transform-origin: 50% 90%; animation: ch-stretch .6s cubic-bezier(.2, 1.6, .4, 1) calc(var(--i) * 40ms) both; }
+.reward[data-title="swing"] .ch { transform-origin: 50% 0; animation: ch-swing .9s cubic-bezier(.3, 1.4, .5, 1) calc(var(--i) * 50ms) both; }
+.reward[data-title="wave"] .ch {
+  animation: ch-pop .5s cubic-bezier(.2, 1.7, .4, 1) calc(var(--i) * 40ms) both,
+    ch-wave 1.2s ease-in-out calc(.7s + var(--i) * 80ms) infinite;
+}
+@keyframes ch-pop { from { transform: scale(0) rotate(-25deg); opacity: 0; } 60% { opacity: 1; } to { transform: none; } }
+@keyframes ch-drop { from { transform: translateY(-160%) rotate(-12deg); opacity: 0; } 30% { opacity: 1; } to { transform: none; } }
+@keyframes ch-stretch { from { transform: scale(.3, 0); } to { transform: none; } }
+@keyframes ch-swing { from { transform: rotate(-80deg); opacity: 0; } 40% { opacity: 1; } to { transform: none; } }
+@keyframes ch-wave { 0%, 60%, 100% { transform: none; } 30% { transform: translateY(-18%); } }
+
 #rewardPraise { position: relative; margin: 0; font: 700 clamp(22px, min(6vw, 4.5vh), 40px)/1.15 var(--font-display); text-wrap: balance; }
 #rewardSong { position: relative; margin: 0; max-width: 34ch; font-size: 17px; font-weight: 600; overflow-wrap: anywhere; }
-.progress { position: relative; width: min(420px, 80%); height: 10px; border-radius: 999px; background: color-mix(in srgb, var(--sun-ink) 20%, transparent); overflow: hidden; }
-.progress i { display: block; height: 100%; background: var(--sun-ink); transform: scaleX(0); transform-origin: left; }
+.progress { position: relative; width: min(420px, 80%); height: 10px; border-radius: 999px; background: color-mix(in srgb, var(--scene-ink) 20%, transparent); overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--scene-ink); transform: scaleX(0); transform-origin: left; }
 .stop {
   position: relative; min-height: 52px; padding: 0 26px;
   display: inline-flex; align-items: center; gap: 8px;
   border: 0; border-radius: 999px;
-  background: var(--sun-ink); color: var(--sun);
+  background: var(--scene-ink); color: var(--scene-bg);
   font-weight: 600;
 }
 .reward-actions { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 100%; }
 #confetti { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
 .reward-body { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; min-width: 0; }
-.note { position: absolute; left: var(--x); bottom: -44px; width: 36px; height: 36px; color: var(--sun-ink); opacity: 0; animation: rise 3.4s linear infinite; animation-delay: var(--d); }
+.note { position: absolute; left: var(--x); bottom: -44px; width: 36px; height: 36px; color: var(--scene-ink); opacity: 0; animation: rise 3.4s linear infinite; animation-delay: var(--d); }
+.reward:not(.is-song) .note { display: none; }
 @keyframes rise {
   0% { transform: translateY(0) rotate(-8deg); opacity: 0; }
   12% { opacity: .3; }
@@ -282,10 +385,13 @@ button { cursor: pointer; }
   .prompt { min-height: 36px; }
   #status { font-size: 14px; }
   .reward { padding: 8px 12px; gap: 6px; }
+  .reward-body { gap: 6px; }
+  .buddy-wrap { display: none; }
   .stop { min-height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .reward h2 { animation: none; }
+  .reward h2, .ch, .rays, .buddy-wrap, .buddy,
+  .reward.enter, .reward.jolt, .reward.leaving { animation: none !important; }
   .note { display: none; }
   .pad.sounding::before, .pad.sounding::after { animation: none; transform: translate(-50%, -50%) scale(1.8); opacity: .5; }
   .pad.sounding::after { display: none; }
@@ -297,6 +403,7 @@ button { cursor: pointer; }
   <symbol id="i-sound" viewBox="0 0 24 24"><path fill="currentColor" d="M4 9.5v5h3.5L12 19V5L7.5 9.5z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.8 7.8 0 0 1 0 11"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.2v13.6L19.5 12z"/></symbol>
   <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2" fill="currentColor"/></symbol>
+  <defs><path id="star-shape" d="M50 6 L63.5 35.4 L95.7 39.2 L71.9 61.1 L78.2 92.8 L50 77 L21.8 92.8 L28.1 61.1 L4.3 39.2 L36.5 35.4 Z"/></defs>
 </svg>
 
 <div class="app">
@@ -330,6 +437,7 @@ button { cursor: pointer; }
     </div>
 
     <section id="reward" class="reward" hidden>
+      <div class="rays" aria-hidden="true"></div>
       <svg class="note" style="--x:6%;--d:0s" aria-hidden="true"><use href="#i-note"/></svg>
       <svg class="note" style="--x:20%;--d:1.3s" aria-hidden="true"><use href="#i-note"/></svg>
       <svg class="note" style="--x:34%;--d:2.4s" aria-hidden="true"><use href="#i-note"/></svg>
@@ -338,6 +446,17 @@ button { cursor: pointer; }
       <svg class="note" style="--x:78%;--d:.3s" aria-hidden="true"><use href="#i-note"/></svg>
       <svg class="note" style="--x:90%;--d:2.8s" aria-hidden="true"><use href="#i-note"/></svg>
       <div class="reward-body">
+        <div class="buddy-wrap" aria-hidden="true">
+          <svg class="buddy" viewBox="-6 -6 116 116">
+            <use class="b-shadow" href="#star-shape" x="4" y="7"/>
+            <use class="b-body" href="#star-shape"/>
+            <ellipse class="b-eye" cx="41" cy="50" rx="4.5" ry="6"/>
+            <ellipse class="b-eye" cx="59" cy="50" rx="4.5" ry="6"/>
+            <circle class="b-cheek" cx="35" cy="61" r="4.5"/>
+            <circle class="b-cheek" cx="65" cy="61" r="4.5"/>
+            <path class="b-smile" d="M43 60 Q50 68 57 60"/>
+          </svg>
+        </div>
         <h2 id="rewardTitle">It's true!</h2>
         <p id="rewardPraise"></p>
         <p id="rewardSong"></p>
@@ -399,7 +518,8 @@ button { cursor: pointer; }
       <h3>Cách chơi</h3>
       <ol class="steps">
         <li>Hỏi Dora một câu, ví dụ: “Đây là con mèo phải không?”</li>
-        <li>Bấm True: trống dồn “ta-da!”, máy reo “It's true!”, rồi nhạc tiệc tùng có vỗ tay và pháo giấy trong lúc máy khen Dora.</li>
+        <li>Bấm True: máy reo “It's true!” rồi khen Dora. Mỗi lần là một cảnh khác nhau với nhạc riêng: pháo giấy, bóng bay, pháo hoa, mưa sao hoặc bóng nảy.</li>
+        <li>Trong lúc ăn mừng, Dora chạm vào màn hình để bóp bóng bay, bắn pháo hoa, rắc sao hoặc làm bóng nảy lên.</li>
         <li>Bấm False: máy đọc nhẹ nhàng “It's false.”, không phát nhạc.</li>
         <li>Muốn nghe bài hát, bấm Phát nhạc ở trên.</li>
       </ol>
@@ -479,8 +599,8 @@ button { cursor: pointer; }
     }
     requestWakeLock();
     renderVoiceNote();
-    // Dựng sẵn tiếng thưởng để lần bấm True đầu tiên kêu ngay.
-    setTimeout(() => { sound('tada'); sound('party'); }, 400);
+    // Dựng sẵn tiếng của cảnh sắp tới để lần bấm True đầu tiên kêu ngay.
+    prepareScene(SCENES[peekScene()]);
   }
 
   async function requestWakeLock() {
@@ -493,94 +613,313 @@ button { cursor: pointer; }
   }
 
   const hz = (midi) => 440 * Math.pow(2, (midi - 69) / 12);
-  const TIMBRE = {
-    bell: [[1, 1, 3.2], [2, 0.45, 5.5], [3.01, 0.2, 8], [4.2, 0.08, 12]],
-    wood: [[1, 1, 3.8], [2, 0.38, 7], [3, 0.14, 11]],
-    soft: [[1, 1, 2.2], [2, 0.3, 4]],
-    brass: [[1, 1, 0.6], [2, 0.7, 0.9], [3, 0.5, 1.2], [4, 0.32, 1.6], [5, 0.2, 2], [6, 0.12, 2.5]],
-    bass: [[1, 1, 1.5], [2, 0.5, 2.5], [3, 0.2, 4]]
-  };
+  /* Bộ tổng hợp âm thanh thuần tính toán, không đụng tới trang. Nó chạy trong một Web Worker
+     để dựng nhạc không bao giờ làm khựng hình; nơi nào chặn worker thì chạy ngay trên trang. */
+  function synthCore() {
+    'use strict';
+    const TIMBRE = {
+      bell: [[1, 1, 3.2], [2, 0.45, 5.5], [3.01, 0.2, 8], [4.2, 0.08, 12]],
+      wood: [[1, 1, 3.8], [2, 0.38, 7], [3, 0.14, 11]],
+      soft: [[1, 1, 2.2], [2, 0.3, 4]],
+      brass: [[1, 1, 0.6], [2, 0.7, 0.9], [3, 0.5, 1.2], [4, 0.32, 1.6], [5, 0.2, 2], [6, 0.12, 2.5]],
+      bass: [[1, 1, 1.5], [2, 0.5, 2.5], [3, 0.2, 4]]
+    };
 
-  // Trống tổng hợp từ tiếng ồn có hạt giống cố định, nên lần nào nghe cũng giống nhau.
-  let noiseSeed = 12345;
-  const noise = () => { noiseSeed = (noiseSeed * 16807) % 2147483647; return noiseSeed / 1073741823.5 - 1; };
-  const DRUMS = {
-    kick(out, from, length, rate, g) {
-      let phase = 0;
-      for (let i = 0; i < length; i++) {
-        const t = i / rate;
-        phase += 2 * Math.PI * (48 + 110 * Math.exp(-t * 28)) / rate;
-        out[from + i] += g * Math.exp(-t * 9) * Math.sin(phase) * Math.min(1, (length - i) / (0.01 * rate));
+    // Trống tổng hợp từ tiếng ồn có hạt giống cố định, nên lần nào nghe cũng giống nhau.
+    let noiseSeed = 12345;
+    const noise = () => { noiseSeed = (noiseSeed * 16807) % 2147483647; return noiseSeed / 1073741823.5 - 1; };
+    const DRUMS = {
+      kick(out, from, length, rate, g) {
+        let phase = 0;
+        const sweepShrink = Math.exp(-28 / rate);
+        const bodyShrink = Math.exp(-9 / rate);
+        const fade = 0.01 * rate;
+        let sweep = 1;
+        let body = g;
+        for (let i = 0; i < length; i++) {
+          phase += 2 * Math.PI * (48 + 110 * sweep) / rate;
+          const left = length - i;
+          out[from + i] += body * Math.sin(phase) * (left < fade ? left / fade : 1);
+          sweep *= sweepShrink;
+          body *= bodyShrink;
+        }
+      },
+      snare(out, from, length, rate, g) {
+        const rattleShrink = Math.exp(-20 / rate);
+        const toneShrink = Math.exp(-28 / rate);
+        const turn = 2 * Math.PI * 185 / rate;
+        const cr = toneShrink * Math.cos(turn);
+        const ci = toneShrink * Math.sin(turn);
+        let rattle = g * 0.75;
+        let re = g * 0.45;
+        let im = 0;
+        let prev = 0;
+        for (let i = 0; i < length; i++) {
+          const w = noise();
+          out[from + i] += (w - prev) * rattle + im;
+          prev = w;
+          rattle *= rattleShrink;
+          const next = re * cr - im * ci;
+          im = re * ci + im * cr;
+          re = next;
+        }
+      },
+      hat(out, from, length, rate, g, n) {
+        const shrink = Math.exp(-(n.dk || 55) / rate);
+        let env = g * 0.5;
+        let prev = 0;
+        for (let i = 0; i < length; i++) {
+          const w = noise();
+          out[from + i] += (w - prev) * env;
+          prev = w;
+          env *= shrink;
+        }
+      },
+      // Pháo hoa: tiếng ùm trầm và tiếng gió vút lên trước đó.
+      boom(out, from, length, rate, g) {
+        const sweepShrink = Math.exp(-12 / rate);
+        const bodyShrink = Math.exp(-3.2 / rate);
+        const rumbleShrink = Math.exp(-4 / rate);
+        const fade = 0.05 * rate;
+        let sweep = 1;
+        let body = g * 0.9;
+        let rumble = g * 2.2;
+        let phase = 0;
+        let low = 0;
+        for (let i = 0; i < length; i++) {
+          phase += 2 * Math.PI * (38 + 70 * sweep) / rate;
+          low += 0.06 * (noise() - low);
+          const left = length - i;
+          out[from + i] += (body * Math.sin(phase) + rumble * low) * (left < fade ? left / fade : 1);
+          sweep *= sweepShrink;
+          body *= bodyShrink;
+          rumble *= rumbleShrink;
+        }
+      },
+      whoosh(out, from, length, rate, g) {
+        let low = 0;
+        for (let i = 0; i < length; i++) {
+          const k = i / length;
+          low += (0.02 + 0.35 * k * k) * (noise() - low);
+          out[from + i] += g * 1.6 * low * k * k * Math.min(1, (length - i) / (0.03 * rate));
+        }
+      },
+      crackle(out, from, length, rate, g) {
+        const count = Math.round((length / rate) * 45);
+        const click = Math.floor(0.006 * rate);
+        for (let c = 0; c < count; c++) {
+          const start = from + Math.floor(((noise() + 1) / 2) * Math.max(1, length - click));
+          const amp = g * (0.4 + 0.3 * (noise() + 1)) * (1 - (start - from) / length);
+          let prev = 0;
+          for (let j = 0; j < click && start + j < out.length; j++) {
+            const w = noise();
+            out[start + j] += amp * (w - prev) * Math.exp(-(j / rate) * 900);
+            prev = w;
+          }
+        }
+      },
+      // Bóp bóng bay: tiếng bụp ngắn có chút trầm.
+      pop(out, from, length, rate, g) {
+        const snapShrink = Math.exp(-70 / rate);
+        const toneShrink = Math.exp(-35 / rate);
+        const turn = 2 * Math.PI * 150 / rate;
+        const cr = toneShrink * Math.cos(turn);
+        const ci = toneShrink * Math.sin(turn);
+        let snap = g * 1.2;
+        let re = g * 0.8;
+        let im = 0;
+        let prev = 0;
+        for (let i = 0; i < length; i++) {
+          const w = noise();
+          out[from + i] += (w - prev) * snap + im;
+          prev = w;
+          snap *= snapShrink;
+          const next = re * cr - im * ci;
+          im = re * ci + im * cr;
+          re = next;
+        }
+      },
+      // Lò xo "boing": cao độ vút lên rồi rung nhẹ.
+      boing(out, from, length, rate, g, n) {
+        const base = n.f || 260;
+        const riseShrink = Math.exp(-16 / rate);
+        const bodyShrink = Math.exp(-6 / rate);
+        const wobble = 2 * Math.PI * 13 / rate;
+        const attack = 0.004 * rate;
+        const fade = 0.02 * rate;
+        let rise = 1;
+        let body = g;
+        let phase = 0;
+        for (let i = 0; i < length; i++) {
+          const f = base * (1 + 0.7 * (1 - rise)) * (1 + 0.06 * Math.sin(wobble * i));
+          phase += 2 * Math.PI * f / rate;
+          const left = length - i;
+          out[from + i] += body * (Math.sin(phase) + 0.3 * Math.sin(2 * phase)) * (i < attack ? i / attack : 1) * (left < fade ? left / fade : 1);
+          rise *= riseShrink;
+          body *= bodyShrink;
+        }
+      },
+      // Vỗ tay: ba tiếng tách sát nhau rồi đuôi ngắn. Các đường suy giảm tính bằng phép nhân cho nhanh.
+      clap(out, from, length, rate, g) {
+        const slow = Math.exp(-14 / rate);
+        const fast = Math.exp(-180 / rate);
+        const hits = [0, Math.round(0.011 * rate), Math.round(0.022 * rate)];
+        let tail = 0.5;
+        let spikes = 0;
+        let prev = 0;
+        for (let i = 0; i < length; i++) {
+          if (i === hits[0] || i === hits[1] || i === hits[2]) spikes += 1;
+          const w = noise();
+          out[from + i] += g * 0.6 * (w - prev) * (tail + spikes);
+          prev = w;
+          tail *= slow;
+          spikes *= fast;
+        }
+      },
+      crash(out, from, length, rate, g) {
+        const shrink = Math.exp(-2.6 / rate);
+        const fade = 0.05 * rate;
+        let env = 1;
+        let prev = 0;
+        for (let i = 0; i < length; i++) {
+          const w = noise();
+          const left = length - i;
+          out[from + i] += g * 0.6 * (w - prev) * env * (left < fade ? left / fade : 1);
+          prev = w;
+          env *= shrink;
+        }
       }
-    },
-    snare(out, from, length, rate, g) {
-      let prev = 0;
-      for (let i = 0; i < length; i++) {
-        const t = i / rate;
-        const w = noise();
-        out[from + i] += g * (0.75 * (w - prev) * Math.exp(-t * 20) + 0.45 * Math.sin(2 * Math.PI * 185 * t) * Math.exp(-t * 28));
-        prev = w;
+    };
+
+    function mix(notes, seconds, drive, rate) {
+      const out = new Float32Array(Math.ceil(seconds * rate));
+      noiseSeed = 12345;
+      for (const n of notes) {
+        const from = Math.floor(n.t * rate);
+        const length = Math.min(out.length - from, Math.floor(n.d * rate));
+        if (length <= 0) continue;
+        if (DRUMS[n.k]) { DRUMS[n.k](out, from, length, rate, n.g, n); continue; }
+        const attack = n.a || 0.004;
+        const slide = n.s || 0;
+        const release = 0.02 * rate;
+        if (slide) {
+          for (let i = 0; i < length; i++) {
+            const t = i / rate;
+            const envelope = Math.min(1, t / attack) * Math.min(1, (length - i) / release);
+            const phase = 2 * Math.PI * n.f * (t - slide * t * t / 2);
+            let sample = 0;
+            for (const part of TIMBRE[n.k]) sample += part[1] * Math.exp(-part[2] * t) * Math.sin(part[0] * phase);
+            out[from + i] += n.g * envelope * sample;
+          }
+          continue;
+        }
+        // Nốt không trượt cao độ: mỗi họa âm là một vectơ quay và co dần, chỉ cần nhân cộng, nhanh hơn
+        // gọi sin và exp ở từng mẫu khoảng mười lần, nên dựng nhạc không làm giật hình trên điện thoại.
+        const attackSamples = attack * rate;
+        for (const part of TIMBRE[n.k]) {
+          const freq = n.f * part[0];
+          if (freq >= rate / 2) continue;
+          const turn = 2 * Math.PI * freq / rate;
+          const shrink = Math.exp(-part[2] / rate);
+          const cr = shrink * Math.cos(turn);
+          const ci = shrink * Math.sin(turn);
+          let re = n.g * part[1];
+          let im = 0;
+          for (let i = 0; i < length; i++) {
+            const left = length - i;
+            const envelope = (i < attackSamples ? i / attackSamples : 1) * (left < release ? left / release : 1);
+            out[from + i] += envelope * im;
+            const next = re * cr - im * ci;
+            im = re * ci + im * cr;
+            re = next;
+          }
+        }
       }
-    },
-    hat(out, from, length, rate, g) {
-      let prev = 0;
-      for (let i = 0; i < length; i++) {
-        const w = noise();
-        out[from + i] += g * 0.5 * (w - prev) * Math.exp(-(i / rate) * 55);
-        prev = w;
+      let peak = 0;
+      for (let i = 0; i < out.length; i++) peak = Math.max(peak, Math.abs(out[i]));
+      if (peak > 0) {
+        // drive nén nhẹ để tiếng thưởng dày và to hơn mà không bị vỡ.
+        const shape = drive ? (x) => Math.tanh(drive * x) / Math.tanh(drive) : (x) => x;
+        for (let i = 0; i < out.length; i++) out[i] = 0.85 * shape(out[i] / peak);
       }
-    },
-    clap(out, from, length, rate, g) {
-      let prev = 0;
-      for (let i = 0; i < length; i++) {
-        const t = i / rate;
-        let env = 0.5 * Math.exp(-t * 14);
-        for (let k = 0; k < 3; k++) if (t >= k * 0.011) env += Math.exp(-(t - k * 0.011) * 180);
-        const w = noise();
-        out[from + i] += g * 0.6 * (w - prev) * env;
-        prev = w;
-      }
-    },
-    crash(out, from, length, rate, g) {
-      let prev = 0;
-      for (let i = 0; i < length; i++) {
-        const w = noise();
-        out[from + i] += g * 0.6 * (w - prev) * Math.exp(-(i / rate) * 2.6) * Math.min(1, (length - i) / (0.05 * rate));
-        prev = w;
-      }
+      return out;
     }
-  };
+    return { mix };
+  }
+  const core = synthCore();
 
+  // Công thức chỉ ghi lại danh sách nốt; việc dựng thành âm thanh làm sau, ở worker hoặc ngay trên trang.
   function render(notes, seconds, drive) {
+    return { notes, seconds, drive };
+  }
+  function toBuffer(data) {
     const c = getCtx();
-    const rate = c.sampleRate;
-    const buffer = c.createBuffer(1, Math.ceil(seconds * rate), rate);
-    const out = buffer.getChannelData(0);
-    noiseSeed = 12345;
-    for (const n of notes) {
-      const from = Math.floor(n.t * rate);
-      const length = Math.min(out.length - from, Math.floor(n.d * rate));
-      if (DRUMS[n.k]) { DRUMS[n.k](out, from, length, rate, n.g); continue; }
-      const attack = n.a || 0.004;
-      const slide = n.s || 0;
-      const release = 0.02 * rate;
-      for (let i = 0; i < length; i++) {
-        const t = i / rate;
-        const envelope = Math.min(1, t / attack) * Math.min(1, (length - i) / release);
-        const phase = 2 * Math.PI * n.f * (t - slide * t * t / 2);
-        let sample = 0;
-        for (const part of TIMBRE[n.k]) sample += part[1] * Math.exp(-part[2] * t) * Math.sin(part[0] * phase);
-        out[from + i] += n.g * envelope * sample;
-      }
-    }
-    let peak = 0;
-    for (let i = 0; i < out.length; i++) peak = Math.max(peak, Math.abs(out[i]));
-    if (peak > 0) {
-      // drive nén nhẹ để tiếng thưởng dày và to hơn mà không bị vỡ.
-      const shape = drive ? (x) => Math.tanh(drive * x) / Math.tanh(drive) : (x) => x;
-      for (let i = 0; i < out.length; i++) out[i] = 0.85 * shape(out[i] / peak);
-    }
+    const buffer = c.createBuffer(1, data.length, c.sampleRate);
+    buffer.copyToChannel(data, 0);
     return buffer;
+  }
+
+  let synthWorker = null;
+  let workerBroken = false;
+  let jobCount = 0;
+  const jobs = new Map();
+  function dropWorker() {
+    workerBroken = true;
+    if (synthWorker) synthWorker.terminate();
+    synthWorker = null;
+    jobs.forEach((job) => job.reject(new Error('worker')));
+    jobs.clear();
+  }
+  function getWorker() {
+    if (synthWorker || workerBroken) return synthWorker;
+    try {
+      const code = 'const core = (' + synthCore.toString() + ')();\n' +
+        'onmessage = (e) => { const d = e.data; const data = core.mix(d.notes, d.seconds, d.drive, d.rate); postMessage({ id: d.id, data }, [data.buffer]); };';
+      const url = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
+      synthWorker = new Worker(url);
+      URL.revokeObjectURL(url);
+      synthWorker.onmessage = (event) => {
+        const job = jobs.get(event.data.id);
+        if (!job) return;
+        jobs.delete(event.data.id);
+        clearTimeout(job.timer);
+        job.resolve(event.data.data);
+      };
+      synthWorker.onerror = dropWorker;
+    } catch (e) {
+      workerBroken = true;
+      synthWorker = null;
+    }
+    return synthWorker;
+  }
+
+  const rendered = {};
+  const rendering = {};
+  // Dựng ngay trên trang: dùng cho tiếng ngắn, hoặc khi không có worker.
+  function sound(name) {
+    if (!rendered[name]) {
+      const spec = RECIPES[name]();
+      rendered[name] = toBuffer(core.mix(spec.notes, spec.seconds, spec.drive, getCtx().sampleRate));
+    }
+    return rendered[name];
+  }
+  // Dựng ở worker rồi trả về khi xong; worker lỗi hay quá chậm thì dựng ngay trên trang.
+  function soundAsync(name) {
+    if (rendered[name]) return Promise.resolve(rendered[name]);
+    if (rendering[name]) return rendering[name];
+    const worker = getWorker();
+    if (!worker) return Promise.resolve(sound(name));
+    const spec = RECIPES[name]();
+    const id = ++jobCount;
+    rendering[name] = new Promise((resolve, reject) => {
+      const timer = setTimeout(() => { if (jobs.delete(id)) reject(new Error('slow')); }, 4000);
+      jobs.set(id, { resolve, reject, timer });
+      worker.postMessage({ id, notes: spec.notes, seconds: spec.seconds, drive: spec.drive, rate: getCtx().sampleRate });
+    })
+      .then((data) => (rendered[name] = rendered[name] || toBuffer(data)))
+      .catch(() => sound(name))
+      .finally(() => { delete rendering[name]; });
+    return rendering[name];
   }
 
   const RECIPES = {
@@ -665,58 +1004,200 @@ button { cursor: pointer; }
   }
   Object.keys(TUNE_BOOK).forEach((key) => { RECIPES[key] = () => renderTune(TUNE_BOOK[key]); });
 
-  // Tiếng thưởng của True: "ta-da!" có trống dồn, rồi một đoạn nhạc tiệc tùng 140 nhịp/phút có vỗ tay.
-  RECIPES.tada = () => {
-    const notes = [];
-    for (let i = 0; i < 12; i++) notes.push({ t: i * 0.04, d: 0.12, g: 0.2 + i * 0.05, k: 'snare' });
-    [55, 59, 62, 67].forEach((m) => notes.push({ t: 0.36, f: hz(m), d: 0.12, g: 0.32, k: 'brass', a: 0.01 }));
-    notes.push({ t: 0.5, d: 0.4, g: 1, k: 'kick' });
-    notes.push({ t: 0.5, d: 1.2, g: 0.7, k: 'crash' });
-    [60, 64, 67, 72].forEach((m) => notes.push({ t: 0.5, f: hz(m), d: 1, g: 0.42, k: 'brass', a: 0.02 }));
-    notes.push({ t: 0.5, f: hz(48), d: 0.9, g: 0.6, k: 'bass' });
-    [84, 88, 91, 96].forEach((m, i) => notes.push({ t: 0.5 + i * 0.06, f: hz(m), d: 0.7, g: 0.3, k: 'bell' }));
-    return render(notes, 1.7, 1.6);
-  };
-  RECIPES.party = () => {
-    const beat = 60 / 140;
-    const notes = [];
-    const hit = (at, k, g, d) => notes.push({ t: at * beat, d, g, k });
-    for (let b = 0; b < 8; b++) {
-      hit(b, 'kick', 1, 0.35);
-      hit(b, 'hat', 0.18, 0.06);
-      hit(b + 0.5, 'hat', 0.35, 0.08);
-      if (b % 2 === 1) hit(b, 'clap', 0.7, 0.25);
-    }
-    // Bass nhảy quãng tám theo hợp âm Đô, Đô, Fa, Sol.
-    [48, 48, 48, 48, 53, 53, 55, 55].forEach((r, b) => {
-      notes.push({ t: b * beat, f: hz(r), d: beat * 0.45, g: 0.55, k: 'bass', a: 0.005 });
-      notes.push({ t: (b + 0.5) * beat, f: hz(r + 12), d: beat * 0.4, g: 0.45, k: 'bass', a: 0.005 });
-    });
-    // Kèn đánh vào nhịp nghịch.
-    const chords = [[60, 64, 67], [60, 64, 67], [60, 64, 67], [60, 64, 67], [60, 65, 69], [60, 65, 69], [62, 67, 71], [62, 67, 71]];
-    chords.forEach((chord, b) => chord.forEach((m) => notes.push({ t: (b + 0.5) * beat, f: hz(m), d: 0.16, g: 0.28, k: 'brass', a: 0.012 })));
-    // Giai điệu chuông vui đi lên.
-    const riff = [[0, 72], [0.5, 76], [1, 79], [1.5, 76], [2, 81], [2.5, 79], [3, 76], [3.5, 79], [4, 77], [4.5, 81], [5, 79], [5.5, 77], [6, 74], [6.5, 79], [7, 84]];
-    riff.forEach((step, i) => notes.push({ t: step[0] * beat, f: hz(step[1]), d: i === riff.length - 1 ? 0.9 : beat * 0.55, g: 0.6, k: 'bell' }));
-    // Cú chốt cuối.
-    hit(8, 'kick', 1, 0.4);
-    hit(8, 'crash', 0.7, 1.1);
-    [60, 64, 67, 72].forEach((m) => notes.push({ t: 8 * beat, f: hz(m), d: 0.9, g: 0.4, k: 'brass', a: 0.02 }));
-    notes.push({ t: 8 * beat, f: hz(48), d: 0.8, g: 0.6, k: 'bass' });
-    // Tiếng vỗ tay rộn ràng ở nền.
-    const total = 8 * beat + 1.1;
-    let seed = 99;
-    const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  /* Tiếng thưởng của True. Mỗi cảnh có một đoạn mở màn (cú chốt luôn rơi đúng giây 0,5 để
+     hình rung khớp tiếng) và một đoạn nhạc tiệc 8 phách riêng: khác điệu, khác nhạc cụ, khác nhịp trống. */
+  const HIT_AT = 0.5;
+  function chordHit(notes, t, chord, bass) {
+    notes.push({ t, d: 0.4, g: 1, k: 'kick' });
+    notes.push({ t, d: 1.2, g: 0.7, k: 'crash' });
+    chord.forEach((m) => notes.push({ t, f: hz(m), d: 1, g: 0.42, k: 'brass', a: 0.02 }));
+    notes.push({ t, f: hz(bass), d: 0.9, g: 0.6, k: 'bass' });
+  }
+  function sparkle(notes, t, list, gap) {
+    list.forEach((m, i) => notes.push({ t: t + i * (gap || 0.06), f: hz(m), d: 0.7, g: 0.3, k: 'bell' }));
+  }
+  // Tiếng vỗ tay rộn ràng ở nền, rải ngẫu nhiên nhưng lần nào cũng giống nhau.
+  function crowd(notes, total, seed) {
+    let s = seed || 99;
+    const rand = () => (s = (s * 16807) % 2147483647) / 2147483647;
     for (let i = 0; i < 110; i++) {
       const t = 0.1 + rand() * (total - 0.4);
       const fade = Math.max(0, Math.min(1, t / 0.5) * Math.min(1, (total - t) / 0.8));
       notes.push({ t, d: 0.12, g: (0.06 + rand() * 0.1) * fade, k: 'clap' });
     }
-    return render(notes, total, 1.8);
+  }
+  const DRUM_PATTERNS = {
+    four(hit) {
+      for (let b = 0; b < 8; b++) {
+        hit(b, 'kick', 1, 0.35);
+        hit(b, 'hat', 0.18, 0.06);
+        hit(b + 0.5, 'hat', 0.35, 0.08);
+        if (b % 2 === 1) hit(b, 'clap', 0.7, 0.25);
+      }
+    },
+    shuffle(hit) {
+      for (let b = 0; b < 8; b++) {
+        hit(b, 'kick', b % 2 ? 0.7 : 1, 0.3);
+        hit(b, 'hat', 0.15, 0.05);
+        hit(b + 0.5, 'hat', 0.4, 0.08);
+        if (b % 2 === 1) hit(b, 'snare', 0.55, 0.18);
+      }
+    },
+    march(hit) {
+      for (let b = 0; b < 8; b++) {
+        if (b % 2 === 0) hit(b, 'kick', 1, 0.4);
+        else hit(b, 'snare', 0.75, 0.2);
+        hit(b + 0.5, 'snare', 0.18, 0.08);
+      }
+      for (let i = 0; i < 6; i++) hit(7.5 + i * 0.083, 'snare', 0.25 + i * 0.08, 0.1);
+    },
+    disco(hit) {
+      for (let b = 0; b < 8; b++) {
+        hit(b, 'kick', 1, 0.35);
+        hit(b + 0.25, 'hat', 0.12, 0.04);
+        hit(b + 0.5, 'hat', 0.45, 0.22, { dk: 14 });
+        hit(b + 0.75, 'hat', 0.12, 0.04);
+        if (b % 2 === 1) hit(b, 'clap', 0.75, 0.25);
+      }
+    },
+    bounce(hit) {
+      for (let b = 0; b < 8; b++) {
+        hit(b, 'kick', 1, 0.3);
+        hit(b + 0.5, 'hat', 0.3, 0.07);
+        hit(b + 0.75, 'kick', 0.5, 0.25);
+        if (b % 2 === 1) hit(b, 'clap', 0.7, 0.25);
+      }
+    }
   };
+  function groove(o) {
+    const beat = 60 / o.bpm;
+    const swing = o.swing || 0.5;
+    const at = (b) => {
+      const whole = Math.floor(b);
+      return (whole + (b - whole === 0.5 ? swing : b - whole)) * beat;
+    };
+    const notes = [];
+    DRUM_PATTERNS[o.drums]((b, k, g, d, extra) => notes.push(Object.assign({ t: at(b), d, g, k }, extra)));
+    o.bass.forEach((r, b) => {
+      notes.push({ t: at(b), f: hz(r), d: beat * 0.45, g: 0.55, k: 'bass', a: 0.005 });
+      if (o.octave !== false) notes.push({ t: at(b + 0.5), f: hz(r + 12), d: beat * 0.4, g: 0.45, k: 'bass', a: 0.005 });
+    });
+    if (o.comp) {
+      o.chords.forEach((chord, b) => chord.forEach((m) => notes.push({ t: at(b + 0.5), f: hz(m), d: 0.16, g: o.compGain || 0.28, k: o.comp, a: 0.012 })));
+    }
+    o.riff.forEach((step, i) => notes.push({
+      t: at(step[0]), f: hz(step[1]),
+      d: step[2] ? step[2] * beat : (i === o.riff.length - 1 ? 0.9 : beat * 0.55),
+      g: o.leadGain || 0.6, k: o.lead, a: o.lead === 'brass' ? 0.015 : undefined
+    }));
+    chordHit(notes, 8 * beat, o.end, o.bass[0]);
+    if (o.extra) o.extra(notes, at, beat);
+    const total = 8 * beat + 1.1;
+    crowd(notes, total, o.seed);
+    return render(notes, total, 1.8);
+  }
 
-  const rendered = {};
-  const sound = (name) => rendered[name] || (rendered[name] = RECIPES[name]());
+  // Pháo giấy: trống dồn "ta-da!", rồi nhạc tiệc 140 nhịp/phút ở giọng Đô.
+  RECIPES.tada = () => {
+    const notes = [];
+    for (let i = 0; i < 12; i++) notes.push({ t: i * 0.04, d: 0.12, g: 0.2 + i * 0.05, k: 'snare' });
+    [55, 59, 62, 67].forEach((m) => notes.push({ t: 0.36, f: hz(m), d: 0.12, g: 0.32, k: 'brass', a: 0.01 }));
+    chordHit(notes, HIT_AT, [60, 64, 67, 72], 48);
+    sparkle(notes, HIT_AT, [84, 88, 91, 96]);
+    return render(notes, 1.7, 1.6);
+  };
+  RECIPES.party = () => groove({
+    bpm: 140, drums: 'four', lead: 'bell', comp: 'brass',
+    bass: [48, 48, 48, 48, 53, 53, 55, 55],
+    chords: [[60, 64, 67], [60, 64, 67], [60, 64, 67], [60, 64, 67], [60, 65, 69], [60, 65, 69], [62, 67, 71], [62, 67, 71]],
+    riff: [[0, 72], [0.5, 76], [1, 79], [1.5, 76], [2, 81], [2.5, 79], [3, 76], [3.5, 79], [4, 77], [4.5, 81], [5, 79], [5.5, 77], [6, 74], [6.5, 79], [7, 84]],
+    end: [60, 64, 67, 72]
+  });
+
+  // Bóng bay: còi trượt vút lên, ba tiếng bụp, rồi điệu nhún nhảy kiểu đàn gỗ ở giọng Fa.
+  RECIPES.introBalloons = () => {
+    const notes = [{ t: 0, f: hz(67), d: 0.46, g: 0.7, k: 'soft', a: 0.02, s: -2.2 }];
+    [0.08, 0.2, 0.32].forEach((t, i) => notes.push({ t, d: 0.15, g: 0.45 + i * 0.15, k: 'pop' }));
+    chordHit(notes, HIT_AT, [65, 69, 72, 77], 41);
+    sparkle(notes, HIT_AT, [89, 93, 96, 101]);
+    return render(notes, 1.7, 1.6);
+  };
+  RECIPES.grooveBalloons = () => groove({
+    bpm: 128, swing: 0.62, drums: 'shuffle', lead: 'wood', leadGain: 0.75, comp: 'bell', compGain: 0.2, seed: 7,
+    bass: [41, 41, 41, 41, 46, 46, 48, 48],
+    chords: [[65, 69, 72], [65, 69, 72], [65, 69, 72], [65, 69, 72], [65, 70, 74], [65, 70, 74], [64, 67, 72], [64, 67, 72]],
+    riff: [[0, 72], [0.5, 77], [1, 81], [1.5, 77], [2, 84], [2.5, 81], [3, 77], [3.5, 81], [4, 82], [4.5, 86], [5, 82], [5.5, 77], [6, 79], [6.5, 84], [7, 88], [7.5, 84]],
+    end: [65, 69, 72, 77],
+    extra(notes, at) { notes.push({ t: at(7), f: hz(72), d: 0.4, g: 0.35, k: 'soft', a: 0.02, s: -2 }); }
+  });
+
+  // Pháo hoa: tiếng vút, tiếng ùm, lách tách, rồi kèn hành khúc ở giọng Sol.
+  // Tiếng ùm rơi vào phách 1, 3, 5, 7 và 8, đúng lúc pháo nổ trên màn hình.
+  RECIPES.introFireworks = () => {
+    const notes = [
+      { t: 0, d: HIT_AT - 0.02, g: 0.8, k: 'whoosh' },
+      { t: HIT_AT, d: 1.2, g: 1, k: 'boom' },
+      { t: HIT_AT + 0.12, d: 0.9, g: 0.5, k: 'crackle' }
+    ];
+    [55, 59, 62, 67].forEach((m) => notes.push({ t: HIT_AT, f: hz(m), d: 1, g: 0.4, k: 'brass', a: 0.02 }));
+    sparkle(notes, HIT_AT + 0.1, [86, 91, 95, 98], 0.08);
+    return render(notes, 1.8, 1.6);
+  };
+  RECIPES.grooveFireworks = () => groove({
+    bpm: 120, drums: 'march', lead: 'brass', leadGain: 0.5, octave: false, seed: 23,
+    bass: [43, 43, 43, 43, 48, 48, 50, 50],
+    riff: [[0, 67, 0.5], [0.5, 71, 0.5], [1, 74, 1], [2, 79, 1], [3, 74, 0.5], [3.5, 79, 0.5], [4, 76, 1], [5, 72, 0.5], [5.5, 76, 0.5], [6, 74, 1], [7, 78, 0.5], [7.5, 81, 0.5]],
+    end: [55, 59, 62, 67],
+    extra(notes, at) {
+      [1, 3, 5, 7].forEach((b) => {
+        notes.push({ t: at(b), d: 0.9, g: 0.45, k: 'boom' });
+        notes.push({ t: at(b) + 0.1, d: 0.5, g: 0.3, k: 'crackle' });
+      });
+      notes.push({ t: at(8), d: 1.1, g: 0.8, k: 'boom' });
+      notes.push({ t: at(8) + 0.1, d: 0.9, g: 0.45, k: 'crackle' });
+    }
+  });
+
+  // Mưa sao: chuông lướt đi lên, rồi điệu disco có chuông lấp lánh ở giọng Rê.
+  RECIPES.introStars = () => {
+    const notes = [];
+    [62, 64, 66, 69, 71, 74, 76, 78, 81, 83, 86].forEach((m, i) => notes.push({ t: i * 0.04, f: hz(m), d: 0.4, g: 0.35 + i * 0.03, k: 'bell' }));
+    chordHit(notes, HIT_AT, [62, 66, 69, 74], 50);
+    sparkle(notes, HIT_AT, [86, 90, 93, 98], 0.07);
+    return render(notes, 1.7, 1.6);
+  };
+  RECIPES.grooveStars = () => groove({
+    bpm: 124, drums: 'disco', lead: 'bell', leadGain: 0.55, comp: 'brass', compGain: 0.26, seed: 41,
+    bass: [38, 38, 38, 38, 43, 43, 45, 45],
+    chords: [[62, 66, 69], [62, 66, 69], [62, 66, 69], [62, 66, 69], [62, 67, 71], [62, 67, 71], [61, 64, 69], [61, 64, 69]],
+    riff: [[0, 74], [0.5, 78], [1, 81], [1.5, 86], [2, 78], [2.5, 81], [3, 86], [3.5, 90], [4, 79], [4.5, 83], [5, 86], [5.5, 91], [6, 81], [6.5, 85], [7, 88], [7.5, 93]],
+    end: [62, 66, 69, 74],
+    extra(notes, at) { sparkle(notes, at(8), [86, 90, 93, 98], 0.07); }
+  });
+
+  // Bóng nảy: ba tiếng "boing" cao dần, rồi điệu nảy tưng tưng ở giọng Si giáng.
+  RECIPES.introBounce = () => {
+    const notes = [];
+    [220, 294, 392].forEach((f, i) => notes.push({ t: i * 0.16, f, d: 0.3, g: 0.7, k: 'boing' }));
+    chordHit(notes, HIT_AT, [58, 62, 65, 70], 46);
+    sparkle(notes, HIT_AT, [82, 86, 89, 94]);
+    return render(notes, 1.7, 1.6);
+  };
+  RECIPES.grooveBounce = () => groove({
+    bpm: 132, drums: 'bounce', lead: 'wood', leadGain: 0.75, comp: 'brass', compGain: 0.26, seed: 57,
+    bass: [46, 46, 46, 46, 51, 51, 53, 53],
+    chords: [[65, 70, 74], [65, 70, 74], [65, 70, 74], [65, 70, 74], [67, 70, 75], [67, 70, 75], [65, 69, 72], [65, 69, 72]],
+    riff: [[0, 74], [0.5, 77], [1, 82], [1.5, 77], [2, 79], [2.5, 82], [3, 86], [4, 87], [4.5, 82], [5, 79], [5.5, 75], [6, 77], [6.5, 81], [7, 84], [7.5, 86]],
+    end: [58, 62, 65, 70],
+    extra(notes, at) { [1.5, 3.5, 5.5, 7.5].forEach((b, i) => notes.push({ t: at(b), f: 200 + i * 60, d: 0.3, g: 0.4, k: 'boing' })); }
+  });
+
+  // Tiếng ngắn khi Dora chạm vào màn hình trong lúc ăn mừng.
+  RECIPES.sfxPop = () => render([{ t: 0, d: 0.2, g: 1, k: 'pop' }], 0.25);
+  RECIPES.sfxBoing = () => render([{ t: 0, f: 260, d: 0.45, g: 1, k: 'boing' }], 0.5);
+  RECIPES.sfxTwinkle = () => render([84, 88, 91, 96].map((m, i) => ({ t: i * 0.045, f: hz(m), d: 0.5, g: 0.8, k: 'bell' })), 0.7);
+  RECIPES.sfxBoom = () => render([{ t: 0, d: 0.7, g: 1, k: 'boom' }, { t: 0.06, d: 0.5, g: 0.5, k: 'crackle' }], 0.8);
+
 
   function stopSource() {
     if (!current) return;
@@ -758,6 +1239,27 @@ button { cursor: pointer; }
     source.start(start);
     if (length < buffer.duration) source.stop(start + length);
     return done;
+  }
+
+  // Tiếng ngắn chồng lên nhạc đang phát, không dừng nhạc. Giới hạn nhịp để bàn tay nhỏ đập liên tục không thành ồn.
+  let lastSfxAt = 0;
+  function playSfx(name, gain) {
+    if (!ctx || ctx.state !== 'running') return;
+    if (ctx.currentTime - lastSfxAt < 0.07) return;
+    lastSfxAt = ctx.currentTime;
+    const source = ctx.createBufferSource();
+    source.buffer = sound(name);
+    source.playbackRate.value = 0.9 + Math.random() * 0.25;
+    const volume = ctx.createGain();
+    volume.gain.value = gain || 0.7;
+    source.connect(volume);
+    volume.connect(master);
+    source.start();
+  }
+
+  // Rung nhẹ trên điện thoại Android; máy không hỗ trợ thì bỏ qua.
+  function buzz(pattern) {
+    try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) { /* không bắt buộc */ }
   }
 
   function findVoice(lang) {
@@ -821,7 +1323,7 @@ button { cursor: pointer; }
     stopSource();
     if ('speechSynthesis' in window && (speechSynthesis.speaking || speechSynthesis.pending)) speechSynthesis.cancel();
     clearPads();
-    stopConfetti();
+    fxStop();
     if (previewId) { const id = previewId; previewId = null; markPreview(id, false); }
   }
 
@@ -880,73 +1382,621 @@ button { cursor: pointer; }
     return lastPraise;
   }
 
-  // Pháo giấy bắn từ hai góc dưới rồi rơi xuống trong khoảng 3 giây.
-  let confettiFrame = 0;
-  function stopConfetti() {
-    if (confettiFrame) cancelAnimationFrame(confettiFrame);
-    confettiFrame = 0;
-    $('confetti').hidden = true;
+  /* ---------- Cảnh ăn mừng ---------- */
+  // Mỗi lần True rút một cảnh trong túi đã xáo: dùng hết năm cảnh mới lặp, không lặp ngay cảnh vừa xem.
+  const SCENES = {
+    confetti: { look: 'sun', title: 'pop', move: 'wiggle', intro: 'tada', groove: 'party', bpm: 140, fx: 'confetti', sfx: 'sfxPop' },
+    balloons: { look: 'sky', title: 'drop', move: 'float', intro: 'introBalloons', groove: 'grooveBalloons', bpm: 128, fx: 'balloons', sfx: 'sfxPop' },
+    fireworks: { look: 'night', title: 'stretch', move: 'wiggle', intro: 'introFireworks', groove: 'grooveFireworks', bpm: 120, fx: 'fireworks', sfx: 'sfxBoom' },
+    stars: { look: 'mint', title: 'wave', move: 'spin', intro: 'introStars', groove: 'grooveStars', bpm: 124, fx: 'stars', sfx: 'sfxTwinkle' },
+    bounce: { look: 'pink', title: 'swing', move: 'jump', intro: 'introBounce', groove: 'grooveBounce', bpm: 132, fx: 'bounce', sfx: 'sfxBoing' }
+  };
+  const SONG_LOOK = { look: 'sun', title: '', move: '' };
+  const sceneBag = [];
+  let lastScene = '';
+  function peekScene() {
+    if (!sceneBag.length) {
+      const bag = shuffled(Object.keys(SCENES));
+      if (bag[bag.length - 1] === lastScene) {
+        bag[bag.length - 1] = bag[0];
+        bag[0] = lastScene;
+      }
+      sceneBag.push.apply(sceneBag, bag);
+    }
+    return sceneBag[sceneBag.length - 1];
   }
-  function launchConfetti() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  function takeScene() {
+    lastScene = peekScene();
+    sceneBag.pop();
+    return SCENES[lastScene];
+  }
+
+  // Dựng sẵn tiếng của cảnh sắp tới. Có worker thì giao hết cho nó; không có thì dựng lúc rảnh,
+  // từng đoạn một, và chờ khi đang ăn mừng để hình không bị giật.
+  let prepTimer = 0;
+  function prepareScene(scene) {
+    clearTimeout(prepTimer);
+    const names = [scene.intro, scene.groove, scene.sfx].filter((name) => !rendered[name]);
+    if (getWorker()) {
+      names.forEach((name) => { soundAsync(name); });
+      return;
+    }
+    const step = () => {
+      if (mode === 'reward') { prepTimer = setTimeout(step, 1500); return; }
+      const name = names.shift();
+      if (!name) return;
+      sound(name);
+      prepTimer = setTimeout(step, 80);
+    };
+    prepTimer = setTimeout(step, 300);
+  }
+
+  const CHEERS = {
+    en: ['It\'s true!', 'Yes! It\'s true!', 'Yay! It\'s true!', 'Hooray! It\'s true!', 'Wow! It\'s true!'],
+    vi: ['Đúng rồi!', 'A, đúng rồi!', 'Đúng rồi, đúng rồi!', 'Hoan hô, đúng rồi!', 'Oa, đúng rồi!']
+  };
+  let lastCheer = '';
+  function nextCheer() {
+    const list = CHEERS[settings.voice === 'vi' ? 'vi' : 'en'];
+    const pool = list.filter((c) => c !== lastCheer);
+    lastCheer = pool[Math.floor(Math.random() * pool.length)];
+    return lastCheer;
+  }
+
+  /* ---------- Hiệu ứng hình trên canvas ---------- */
+  // Mọi thứ chạy theo đồng hồ âm thanh: cú chốt lúc 0,5 giây và từng phách của nhạc tiệc.
+  const TAU = Math.PI * 2;
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const pick = (list) => list[Math.floor(Math.random() * list.length)];
+  const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fx = {
+    on: false, kind: '', scene: null, parts: [], frame: 0, last: 0, w: 0, h: 0, paint: null, box: null,
+    colors: [], ink: '#000', hole: null, introAt: 0, hitDone: false, groove: null, beat: -1, fadeFrom: 0, alpha: 1, acc: 0, idle: 0
+  };
+  let starPath = null;
+
+  function panelBox() {
+    const r = $('stage').getBoundingClientRect();
+    const radius = parseFloat(getComputedStyle($('reward')).borderTopLeftRadius) || 32;
+    return { x: r.left, y: r.top, w: r.width, h: r.height - 10, r: radius };
+  }
+  function titleCenter() {
+    const r = $('rewardTitle').getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+  // Sao bắn ra từ ngôi sao cổ vũ phía trên chữ, để chữ "It's true!" sớm lộ ra; màn thấp không có sao thì lấy giữa chữ.
+  function buddyCenter() {
+    const r = document.querySelector('.buddy-wrap').getBoundingClientRect();
+    return r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : titleCenter();
+  }
+  function inBox(x, y) {
+    const b = fx.box;
+    return x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h;
+  }
+  function setBeat(value) {
+    $('reward').style.setProperty('--beat', value.toFixed(3));
+  }
+  function sizeCanvas() {
+    const canvas = $('confetti');
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    fx.w = window.innerWidth;
+    fx.h = window.innerHeight;
+    canvas.width = Math.round(fx.w * ratio);
+    canvas.height = Math.round(fx.h * ratio);
+    fx.paint.setTransform(ratio, 0, 0, ratio, 0, 0);
+    fx.box = panelBox();
+    measureHole();
+  }
+  function measureHole() {
+    const stop = $('stopBtn').getBoundingClientRect();
+    fx.hole = stop.width ? { x: stop.left - 4, y: stop.top - 4, w: stop.width + 8, h: stop.height + 8 } : null;
+  }
+
+  function fxStart(scene, intro) {
+    fxStop();
+    if (reduceMotion()) return;
     const canvas = $('confetti');
     const paint = canvas.getContext('2d');
     if (!paint) return;
-    const ratio = Math.min(window.devicePixelRatio || 1, 2);
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    canvas.width = Math.round(width * ratio);
-    canvas.height = Math.round(height * ratio);
+    const style = getComputedStyle($('reward'));
+    if (!starPath && window.Path2D) starPath = new Path2D($('star-shape').getAttribute('d'));
+    Object.assign(fx, {
+      on: true, kind: scene.fx, scene, parts: [], paint,
+      colors: style.getPropertyValue('--fx-colors').split(',').map((c) => c.trim()).filter(Boolean),
+      ink: style.getPropertyValue('--scene-ink').trim() || '#000',
+      introAt: intro ? intro.start : 0, hitDone: false, groove: null, beat: -1,
+      fadeFrom: 0, alpha: 1, acc: 0, idle: 0, last: performance.now()
+    });
+    sizeCanvas();
     canvas.hidden = false;
-    paint.setTransform(ratio, 0, 0, ratio, 0, 0);
-    const style = getComputedStyle(document.documentElement);
-    const colors = ['--true', '--false', '--on-pad', '--party-blue', '--party-pink'].map((name) => style.getPropertyValue(name).trim());
-    const count = Math.max(90, Math.min(220, Math.round(width / 3)));
-    const pieces = [];
+    FX[fx.kind].start();
+    fx.frame = requestAnimationFrame(fxFrame);
+  }
+  function fxGroove(handle, bpm) {
+    if (fx.on && handle) fx.groove = { start: handle.start, len: 60 / bpm };
+  }
+  function fxFinish() {
+    if (fx.on && !fx.fadeFrom) fx.fadeFrom = performance.now();
+  }
+  function fxStop() {
+    if (fx.frame) cancelAnimationFrame(fx.frame);
+    fx.frame = 0;
+    fx.on = false;
+    fx.parts = [];
+    $('confetti').hidden = true;
+    setBeat(0);
+  }
+  function jolt() {
+    const box = $('reward');
+    box.classList.remove('enter', 'jolt');
+    void box.offsetWidth;
+    box.classList.add('jolt');
+  }
+
+  function fxFrame(now) {
+    const dt = Math.min(0.05, (now - fx.last) / 1000);
+    fx.last = now;
+    const def = FX[fx.kind];
+    if (ctx) {
+      if (!fx.hitDone && fx.introAt && ctx.currentTime >= fx.introAt + HIT_AT) {
+        fx.hitDone = true;
+        measureHole(); // khung đã phồng xong, đo lại chỗ nút cho đúng
+        jolt();
+        if (def.hit) def.hit();
+      }
+      if (fx.groove) {
+        const g = (ctx.currentTime - fx.groove.start) / fx.groove.len;
+        if (g >= 0 && g < 9) {
+          const b = Math.floor(g);
+          if (b !== fx.beat) { fx.beat = b; if (def.beat && !fx.fadeFrom) def.beat(b); }
+          setBeat(Math.pow(1 - (g - b), 3));
+        } else if (g >= 9) setBeat(0);
+      }
+    }
+    if (def.tick && !fx.fadeFrom) def.tick(dt);
+    fx.alpha = fx.fadeFrom ? Math.max(0, 1 - (now - fx.fadeFrom) / 700) : 1;
+    const p = fx.paint;
+    p.clearRect(0, 0, fx.w, fx.h);
+    p.save();
+    // Chừa chỗ nút Dừng nhạc để nút luôn nằm trên cùng và dễ thấy.
+    if (fx.hole) {
+      const h = fx.hole;
+      p.beginPath();
+      p.rect(0, 0, fx.w, fx.h);
+      if (p.roundRect) p.roundRect(h.x, h.y, h.w, h.h, h.h / 2); else p.rect(h.x, h.y, h.w, h.h);
+      p.clip('evenodd');
+    }
+    if (def.clip) {
+      const b = fx.box;
+      p.beginPath();
+      if (p.roundRect) p.roundRect(b.x, b.y, b.w, b.h, b.r); else p.rect(b.x, b.y, b.w, b.h);
+      p.clip();
+    }
+    // Hạt mới sinh ra trong lúc cập nhật (tên lửa nổ thành tia) vào mảng mới, rồi nối lại sau.
+    const list = fx.parts;
+    fx.parts = [];
+    const kept = list.filter((part) => PARTS[part.k](part, dt, p));
+    fx.parts = kept.concat(fx.parts);
+    p.restore();
+    if (fx.fadeFrom && fx.alpha <= 0) { fxStop(); return; }
+    fx.frame = requestAnimationFrame(fxFrame);
+  }
+
+  function addPart(part) {
+    if (fx.parts.length < 420) fx.parts.push(part);
+  }
+  const SHAPES = ['rect', 'rect', 'dot', 'tri', 'squig'];
+  function paper(x, y, vx, vy, extra) {
+    addPart(Object.assign({
+      k: 'paper', x, y, vx, vy, age: 0, life: 4.5, w: rnd(7, 13), h: rnd(5, 10),
+      turn: rnd(0, Math.PI), spin: rnd(-12, 12), shape: pick(SHAPES), color: pick(fx.colors),
+      g: fx.h * 1.15, drag: 1.1, ph: rnd(0, TAU)
+    }, extra));
+  }
+  function cornerBurst(power) {
+    const count = Math.round(Math.max(60, Math.min(160, fx.w / 4)) * power);
     for (let i = 0; i < count; i++) {
       const fromLeft = i % 2 === 0;
       const angle = 0.25 + Math.random() * 0.6;
-      const speed = height * (1.1 + Math.random() * 1.1);
-      pieces.push({
-        x: fromLeft ? 0 : width,
-        y: height,
-        vx: Math.sin(angle) * speed * (fromLeft ? 1 : -1),
-        vy: -Math.cos(angle) * speed,
-        w: 6 + Math.random() * 7,
-        h: 4 + Math.random() * 6,
-        turn: Math.random() * Math.PI,
-        spin: (Math.random() - 0.5) * 12,
-        color: colors[i % colors.length]
+      const speed = fx.h * rnd(1.1, 2.2);
+      paper(fromLeft ? 0 : fx.w, fx.h, Math.sin(angle) * speed * (fromLeft ? 1 : -1), -Math.cos(angle) * speed);
+    }
+  }
+  function puff(x, y, count, extra) {
+    for (let i = 0; i < count; i++) {
+      const a = rnd(0, TAU);
+      const s = rnd(160, 440);
+      paper(x, y, Math.cos(a) * s, Math.sin(a) * s - 140, Object.assign({ life: 2.2 }, extra));
+    }
+  }
+  function ring(x, y, r, color) {
+    addPart({ k: 'ring', x, y, r, color: color || fx.ink, age: 0 });
+  }
+
+  // Bóng bay bay lên từ dưới, lắc lư; chạm vào là nổ bụp thành giấy vụn.
+  function addBalloon(startY) {
+    const r = Math.max(20, Math.min(46, Math.min(fx.w, fx.h) * 0.065)) * rnd(0.85, 1.15);
+    addPart({
+      k: 'balloon', x0: rnd(r, fx.w - r), x: 0, y: startY === undefined ? fx.h + r * 1.4 : startY,
+      vy: -fx.h * rnd(0.16, 0.26), r, color: pick(fx.colors), amp: rnd(8, 22), sw: rnd(1.2, 2.2), ph: rnd(0, TAU), age: 0
+    });
+  }
+  function popBalloon(o) {
+    o.popped = true;
+    puff(o.x, o.y, 14, { color: o.color, g: fx.h * 1.2 });
+    ring(o.x, o.y, o.r);
+    playSfx('sfxPop', 0.8);
+    buzz(12);
+  }
+
+  // Pháo hoa: tên lửa bay lên đúng một phách rồi nổ, nên tiếng ùm và chùm sáng trùng nhau.
+  function randomSky() {
+    const b = fx.box;
+    return { x: b.x + b.w * rnd(0.15, 0.85), y: b.y + b.h * rnd(0.12, 0.5) };
+  }
+  function launch(target, dur, size) {
+    const b = fx.box;
+    addPart({ k: 'rocket', x0: target.x + rnd(-40, 40), y0: b.y + b.h + 10, x1: target.x, y1: target.y, dur, age: 0, color: pick(fx.colors), size: size || 1, trail: [] });
+  }
+  // Hai kiểu nổ xen nhau: hoa cúc tròn đều, và liễu rủ có tia rơi chậm thành đuôi dài.
+  function burst(x, y, color, size) {
+    const willow = Math.random() < 0.35;
+    const count = Math.round((willow ? 44 : 64) * size);
+    const second = pick(fx.colors);
+    const speed = Math.min(fx.box.w, fx.box.h) * (willow ? 0.42 : 0.6) * size;
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * TAU + rnd(-0.05, 0.05);
+      const s = speed * rnd(0.82, 1);
+      addPart({
+        k: 'spark', x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, age: 0,
+        life: willow ? rnd(1.6, 2.2) : rnd(1.1, 1.6), r: rnd(2.6, 4), g: willow ? 220 : 110,
+        tail: willow ? 0.09 : 0.045, color: i % 3 ? color : second
       });
     }
-    const lifetime = 3000;
-    const began = performance.now();
-    let last = began;
-    const frame = (now) => {
-      const age = now - began;
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now;
-      paint.clearRect(0, 0, width, height);
-      paint.globalAlpha = age > lifetime - 700 ? Math.max(0, (lifetime - age) / 700) : 1;
-      const drag = Math.exp(-1.1 * dt);
-      for (const p of pieces) {
-        p.vx *= drag;
-        p.vy = p.vy * drag + height * 1.15 * dt;
-        p.x += p.vx * dt;
-        p.y += p.vy * dt;
-        p.turn += p.spin * dt;
-        paint.save();
-        paint.translate(p.x, p.y);
-        paint.rotate(p.turn);
-        paint.fillStyle = p.color;
-        paint.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.turn * 1.7)) + 1);
-        paint.restore();
-      }
-      if (age >= lifetime) { stopConfetti(); return; }
-      confettiFrame = requestAnimationFrame(frame);
-    };
-    confettiFrame = requestAnimationFrame(frame);
+    addPart({ k: 'flash', x, y, r: speed * 0.18, age: 0 });
+    ring(x, y, speed * 0.22, '#FFFFFF');
   }
+
+  // Mưa sao: sao năm cánh có viền mực bắn ra từ chữ "It's true!".
+  function starBurst(x, y, count, big) {
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * TAU + rnd(-0.2, 0.2);
+      const s = (big ? fx.h * 1.25 : fx.h * 0.5) * rnd(0.65, 1);
+      addPart({
+        k: 'star', x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, r: big ? rnd(16, 30) : rnd(9, 16),
+        rot: rnd(0, TAU), spin: rnd(-6, 6), age: 0, life: rnd(1.2, 1.8), color: pick(fx.colors), g: fx.h * 0.5
+      });
+    }
+    for (let i = 0; i < count; i++) {
+      const a = rnd(0, TAU);
+      const s = fx.h * rnd(0.2, 0.6);
+      paper(x, y, Math.cos(a) * s, Math.sin(a) * s, { shape: 'dot', life: 1.6, w: rnd(5, 9) });
+    }
+  }
+
+  // Bóng nảy trong khung: rơi xuống, bẹp lại khi chạm đáy rồi nảy lên.
+  function addBall(x, y, vy) {
+    const b = fx.box;
+    if (fx.parts.filter((o) => o.k === 'ball').length >= 24) return;
+    const r = Math.max(14, Math.min(34, Math.min(b.w, b.h) * 0.06)) * rnd(0.85, 1.2);
+    const color = pick(fx.colors);
+    addPart({
+      k: 'ball', x: x === undefined ? rnd(b.x + r, b.x + b.w - r) : x, y: y === undefined ? b.y - r - rnd(0, 60) : y,
+      vx: rnd(-160, 160), vy: vy === undefined ? rnd(0, 80) : vy, r, color,
+      band: pick(fx.colors.filter((c) => c !== color)), look: pick(['plain', 'face', 'band']),
+      rot: 0, squash: 0, bounce: rnd(0.68, 0.8), age: 0
+    });
+  }
+  function kickBalls(power) {
+    fx.parts.forEach((o) => {
+      if (o.k !== 'ball') return;
+      o.vy = -fx.h * power * rnd(0.8, 1.2);
+      o.vx += rnd(-180, 180);
+    });
+  }
+
+  const FX = {
+    confetti: {
+      start() { cornerBurst(1); },
+      hit() {
+        const c = buddyCenter();
+        for (let i = 0; i < 50; i++) {
+          const a = rnd(0, TAU);
+          const s = fx.h * rnd(0.4, 1.1);
+          paper(c.x, c.y, Math.cos(a) * s, Math.sin(a) * s - fx.h * 0.3);
+        }
+      },
+      beat(b) { if (b === 0 || b === 4) cornerBurst(0.5); if (b === 8) cornerBurst(1); },
+      tick(dt) {
+        if (!fx.hitDone) return;
+        fx.acc += dt * (fx.groove ? 7 : 5);
+        while (fx.acc >= 1) {
+          fx.acc -= 1;
+          paper(rnd(0, fx.w), -12, rnd(-30, 30), rnd(40, 120), { g: fx.h * 0.35, drag: 1.6, life: 6 });
+        }
+      },
+      tap(x, y) { puff(x, y, 16); playSfx('sfxPop', 0.45); }
+    },
+    balloons: {
+      start() { for (let i = 0; i < 9; i++) addBalloon(fx.h + 60 + i * fx.h * 0.09); },
+      hit() { cornerBurst(0.4); },
+      beat(b) {
+        if (b < 8 && b % 2 === 0) addBalloon();
+        if (b === 8) for (let i = 0; i < 4; i++) addBalloon(fx.h + 40 + i * 50);
+      },
+      tap(x, y) {
+        for (let i = fx.parts.length - 1; i >= 0; i--) {
+          const o = fx.parts[i];
+          if (o.k !== 'balloon' || o.popped) continue;
+          const dx = (x - o.x) / o.r;
+          const dy = (y - o.y) / (o.r * 1.18);
+          if (dx * dx + dy * dy < 1.4) { popBalloon(o); return; }
+        }
+      }
+    },
+    fireworks: {
+      clip: true,
+      start() {
+        const b = fx.box;
+        launch({ x: b.x + b.w / 2, y: b.y + b.h * 0.28 }, HIT_AT - 0.03, 1.2);
+        launch({ x: b.x + b.w * 0.25, y: b.y + b.h * rnd(0.15, 0.35) }, 0.8);
+        launch({ x: b.x + b.w * 0.75, y: b.y + b.h * rnd(0.15, 0.35) }, 1.05);
+        launch(randomSky(), 1.35, 0.9);
+      },
+      beat(b) {
+        if (b < 8 && b % 2 === 0) launch(randomSky(), fx.groove.len);
+        if (b === 7) for (let i = 0; i < 3; i++) launch(randomSky(), fx.groove.len, 1.1);
+      },
+      tick(dt) {
+        if (fx.groove || !fx.hitDone) return;
+        fx.idle += dt;
+        if (fx.idle > 0.7) { fx.idle = 0; launch(randomSky(), 0.6, 0.7); }
+      },
+      tap(x, y) {
+        if (!inBox(x, y)) return;
+        burst(x, y, pick(fx.colors), 0.7);
+        playSfx('sfxBoom', 0.6);
+      }
+    },
+    stars: {
+      start() { const c = buddyCenter(); starBurst(c.x, c.y, 6, false); },
+      hit() { const c = buddyCenter(); starBurst(c.x, c.y, 14, true); },
+      beat(b) {
+        const c = buddyCenter();
+        if (b === 8) starBurst(c.x, c.y, 18, true);
+        else if (b % 2 === 0) { const s = randomSky(); starBurst(s.x, s.y, 6, false); }
+      },
+      // Sao nhỏ rơi lững lờ từ trên xuống để màn hình không trống trong lúc máy đang reo.
+      tick(dt) {
+        if (!fx.hitDone) return;
+        fx.acc += dt * 3;
+        while (fx.acc >= 1) {
+          fx.acc -= 1;
+          addPart({
+            k: 'star', x: rnd(0, fx.w), y: -16, vx: rnd(-20, 20), vy: rnd(60, 120), r: rnd(8, 14),
+            rot: rnd(0, TAU), spin: rnd(-2, 2), age: 0, life: 6, color: pick(fx.colors), g: fx.h * 0.35
+          });
+        }
+      },
+      tap(x, y) { starBurst(x, y, 7, false); playSfx('sfxTwinkle', 0.55); }
+    },
+    bounce: {
+      clip: true,
+      start() { for (let i = 0; i < 6; i++) addBall(); },
+      hit() { for (let i = 0; i < 4; i++) addBall(); },
+      beat(b) { if (b < 8) addBall(); else kickBalls(1.5); },
+      tap(x, y) {
+        if (!inBox(x, y)) return;
+        let kicked = false;
+        fx.parts.forEach((o) => {
+          if (o.k === 'ball' && Math.hypot(o.x - x, o.y - y) < o.r * 1.6) {
+            o.vy = -fx.h * rnd(1, 1.4);
+            o.vx += rnd(-200, 200);
+            kicked = true;
+          }
+        });
+        if (!kicked) addBall(x, y, -320);
+        playSfx('sfxBoing', 0.7);
+      }
+    }
+  };
+
+  // Mỗi loại hạt tự cập nhật rồi tự vẽ; trả về false khi đã hết đời.
+  const PARTS = {
+    paper(o, dt, p) {
+      o.age += dt;
+      const drag = Math.exp(-o.drag * dt);
+      o.vx *= drag;
+      o.vy = o.vy * drag + o.g * dt;
+      o.x += o.vx * dt + Math.sin(o.age * 5 + o.ph) * 22 * dt;
+      o.y += o.vy * dt;
+      o.turn += o.spin * dt;
+      if (o.age > o.life || o.y > fx.h + 30) return false;
+      const flip = Math.abs(Math.cos(o.turn * 1.7)) + 0.08;
+      p.globalAlpha = fx.alpha * Math.min(1, (o.life - o.age) / 0.5);
+      p.save();
+      p.translate(o.x, o.y);
+      p.rotate(o.turn);
+      p.scale(1, flip);
+      p.fillStyle = o.color;
+      p.strokeStyle = o.color;
+      if (o.shape === 'dot') {
+        p.beginPath(); p.arc(0, 0, o.w * 0.45, 0, TAU); p.fill();
+      } else if (o.shape === 'tri') {
+        p.beginPath(); p.moveTo(0, -o.w * 0.55); p.lineTo(o.w * 0.5, o.w * 0.4); p.lineTo(-o.w * 0.5, o.w * 0.4); p.closePath(); p.fill();
+      } else if (o.shape === 'squig') {
+        p.lineWidth = 3; p.lineCap = 'round';
+        p.beginPath(); p.moveTo(-o.w, 0); p.quadraticCurveTo(-o.w / 2, -o.h, 0, 0); p.quadraticCurveTo(o.w / 2, o.h, o.w, 0); p.stroke();
+      } else {
+        p.fillRect(-o.w / 2, -o.h / 2, o.w, o.h);
+      }
+      p.restore();
+      return true;
+    },
+    ring(o, dt, p) {
+      o.age += dt;
+      if (o.age > 0.35) return false;
+      const k = o.age / 0.35;
+      p.globalAlpha = fx.alpha * (1 - k);
+      p.strokeStyle = o.color;
+      p.lineWidth = 4 * (1 - k) + 1;
+      p.beginPath(); p.arc(o.x, o.y, o.r * (0.6 + k * 1.2), 0, TAU); p.stroke();
+      return true;
+    },
+    balloon(o, dt, p) {
+      if (o.popped) return false;
+      o.age += dt;
+      o.y += o.vy * dt;
+      o.x = o.x0 + Math.sin(o.age * o.sw + o.ph) * o.amp;
+      if (o.y < -o.r * 4) return false;
+      const r = o.r;
+      p.globalAlpha = fx.alpha;
+      p.save();
+      p.translate(o.x, o.y);
+      p.rotate(Math.cos(o.age * o.sw + o.ph) * 0.12);
+      p.strokeStyle = fx.ink;
+      p.lineWidth = 1.5;
+      p.beginPath(); p.moveTo(0, r * 1.25); p.bezierCurveTo(r * 0.3, r * 1.7, -r * 0.3, r * 2.2, 0, r * 2.8); p.stroke();
+      p.fillStyle = o.color;
+      p.lineWidth = 2.5;
+      p.beginPath(); p.ellipse(0, 0, r, r * 1.18, 0, 0, TAU); p.fill(); p.stroke();
+      p.beginPath(); p.moveTo(-r * 0.14, r * 1.32); p.lineTo(r * 0.14, r * 1.32); p.lineTo(0, r * 1.16); p.closePath(); p.fill(); p.stroke();
+      p.fillStyle = 'rgba(255, 255, 255, .6)';
+      p.beginPath(); p.ellipse(-r * 0.4, -r * 0.45, r * 0.15, r * 0.27, -0.5, 0, TAU); p.fill();
+      p.restore();
+      return true;
+    },
+    rocket(o, dt, p) {
+      o.age += dt;
+      const k = Math.min(1, o.age / o.dur);
+      const e = 1 - Math.pow(1 - k, 2.2);
+      const x = o.x0 + (o.x1 - o.x0) * e;
+      const y = o.y0 + (o.y1 - o.y0) * e;
+      o.trail.push(x, y);
+      if (o.trail.length > 16) o.trail.splice(0, 2);
+      p.globalAlpha = fx.alpha * 0.8;
+      p.strokeStyle = o.color;
+      p.lineWidth = 3;
+      p.lineCap = 'round';
+      p.beginPath();
+      p.moveTo(o.trail[0], o.trail[1]);
+      for (let i = 2; i < o.trail.length; i += 2) p.lineTo(o.trail[i], o.trail[i + 1]);
+      p.stroke();
+      if (k >= 1) { burst(x, y, o.color, o.size); return false; }
+      return true;
+    },
+    // Tia pháo hoa vẽ thành vệt ngắn theo hướng bay, chậm dần thì thành chấm và nhấp nháy trước khi tắt.
+    spark(o, dt, p) {
+      o.age += dt;
+      if (o.age > o.life) return false;
+      const drag = Math.exp(-2 * dt);
+      o.vx *= drag;
+      o.vy = o.vy * drag + o.g * dt;
+      o.x += o.vx * dt;
+      o.y += o.vy * dt;
+      const left = 1 - o.age / o.life;
+      if (left < 0.3 && Math.random() < 0.35) return true;
+      p.globalAlpha = fx.alpha * Math.min(1, left * 1.8);
+      p.strokeStyle = o.color;
+      p.lineWidth = o.r * (0.55 + 0.45 * left);
+      p.lineCap = 'round';
+      p.beginPath();
+      p.moveTo(o.x - o.vx * o.tail, o.y - o.vy * o.tail);
+      p.lineTo(o.x, o.y);
+      p.stroke();
+      return true;
+    },
+    flash(o, dt, p) {
+      o.age += dt;
+      if (o.age > 0.18) return false;
+      p.globalAlpha = fx.alpha * (1 - o.age / 0.18);
+      p.fillStyle = '#FFFFFF';
+      p.beginPath(); p.arc(o.x, o.y, o.r * (0.5 + o.age / 0.18), 0, TAU); p.fill();
+      return true;
+    },
+    star(o, dt, p) {
+      o.age += dt;
+      if (o.age > o.life) return false;
+      const drag = Math.exp(-2 * dt);
+      o.vx *= drag;
+      o.vy = o.vy * drag + o.g * dt;
+      o.x += o.vx * dt;
+      o.y += o.vy * dt;
+      o.rot += o.spin * dt;
+      const grow = Math.min(1, o.age / 0.15);
+      const fade = Math.min(1, (o.life - o.age) / 0.35);
+      const size = o.r * grow * (0.7 + 0.3 * fade);
+      p.globalAlpha = fx.alpha * fade;
+      p.save();
+      p.translate(o.x, o.y);
+      p.rotate(o.rot);
+      p.fillStyle = o.color;
+      p.strokeStyle = fx.ink;
+      if (starPath) {
+        const s = size / 48;
+        p.scale(s, s);
+        p.translate(-50, -54);
+        p.lineWidth = 6;
+        p.lineJoin = 'round';
+        p.fill(starPath);
+        p.stroke(starPath);
+      } else {
+        p.beginPath(); p.arc(0, 0, size * 0.6, 0, TAU); p.fill();
+      }
+      p.restore();
+      return true;
+    },
+    ball(o, dt, p) {
+      const b = fx.box;
+      o.age += dt;
+      o.vy += fx.h * 1.8 * dt;
+      o.x += o.vx * dt;
+      o.y += o.vy * dt;
+      o.rot += (o.vx / o.r) * dt;
+      const floor = b.y + b.h - o.r - 4;
+      if (o.y > floor) {
+        o.y = floor;
+        if (o.vy > 120) o.squash = Math.min(0.32, o.vy / 3200);
+        o.vy = o.vy > 60 ? -o.vy * o.bounce : 0;
+        o.vx *= 0.97;
+      }
+      if (o.x < b.x + o.r) { o.x = b.x + o.r; o.vx = Math.abs(o.vx) * 0.85; }
+      else if (o.x > b.x + b.w - o.r) { o.x = b.x + b.w - o.r; o.vx = -Math.abs(o.vx) * 0.85; }
+      o.squash *= Math.exp(-12 * dt);
+      const r = o.r;
+      p.globalAlpha = fx.alpha;
+      p.save();
+      p.translate(o.x, o.y + r);
+      p.scale(1 + o.squash, 1 - o.squash);
+      p.translate(0, -r);
+      p.beginPath(); p.arc(0, 0, r, 0, TAU);
+      p.fillStyle = o.color;
+      p.fill();
+      p.save();
+      p.clip();
+      p.rotate(o.rot);
+      if (o.look === 'band') {
+        p.fillStyle = o.band;
+        p.fillRect(-r, -r * 0.24, r * 2, r * 0.48);
+      } else if (o.look === 'face') {
+        p.fillStyle = '#2B1C05';
+        p.beginPath(); p.ellipse(-r * 0.3, -r * 0.12, r * 0.09, r * 0.13, 0, 0, TAU); p.fill();
+        p.beginPath(); p.ellipse(r * 0.3, -r * 0.12, r * 0.09, r * 0.13, 0, 0, TAU); p.fill();
+        p.strokeStyle = '#2B1C05';
+        p.lineWidth = Math.max(2, r * 0.09);
+        p.lineCap = 'round';
+        p.beginPath(); p.arc(0, r * 0.08, r * 0.3, 0.25 * Math.PI, 0.75 * Math.PI); p.stroke();
+      }
+      p.restore();
+      p.fillStyle = 'rgba(255, 255, 255, .55)';
+      p.beginPath(); p.ellipse(-r * 0.38, -r * 0.42, r * 0.18, r * 0.11, -0.6, 0, TAU); p.fill();
+      p.strokeStyle = fx.ink;
+      p.lineWidth = 3;
+      p.beginPath(); p.arc(0, 0, r, 0, TAU); p.stroke();
+      p.restore();
+      return true;
+    }
+  };
 
   function trackProgress(my) {
     const bar = $('rewardBar');
@@ -959,33 +2009,50 @@ button { cursor: pointer; }
     step();
   }
 
-  // Bấm True: "ta-da!" có trống dồn, reo "It's true!", rồi nhạc tiệc tùng sôi động trong lúc khen.
+  // Bấm True: rút một cảnh, mở màn có cú chốt, reo "It's true!", rồi nhạc tiệc của cảnh đó trong lúc khen.
   async function celebrate() {
     unlock();
     cancelAll();
     const my = seq;
+    const scene = takeScene();
     const words = wordsNow();
     const praise = nextPraise();
     const speaking = settings.voice !== 'none';
-    showReward(words.yes, praise, false);
+    showReward(words.yes, praise, false, scene);
     setMode('reward', words.yes + ' ' + praise);
-    launchConfetti();
-    const tada = playBuffer(sound('tada'));
+    buzz([20, 50, 20, 50, 70]);
+    // Thường tiếng đã dựng sẵn từ trước; nếu chưa thì chờ worker một chút, khung thưởng vẫn hiện ngay.
+    const introReady = soundAsync(scene.intro);
+    const grooveReady = soundAsync(scene.groove);
+    const introBuffer = await introReady;
+    if (my !== seq) return;
+    const intro = playBuffer(introBuffer);
+    fxStart(scene, current);
+    prepareScene(SCENES[peekScene()]);
     await wait(650);
     if (my !== seq) return;
     if (speaking) {
-      await speak(words.yes, words.lang, 'excited');
+      await speak(nextCheer(), words.lang, 'excited');
       if (my !== seq) return;
     }
-    await tada;
+    await intro;
     if (my !== seq) return;
-    const party = playBuffer(sound('party'), speaking ? { duck: 0.45, duckSeconds: 2.2 } : {});
+    const grooveBuffer = await grooveReady;
+    if (my !== seq) return;
+    const party = playBuffer(grooveBuffer, speaking ? { duck: 0.45, duckSeconds: 2.2 } : {});
+    fxGroove(current, scene.bpm);
     if (speaking) {
       await speak(praise, words.lang, 'praise');
       if (my !== seq) return;
     }
     await party;
     if (my !== seq) return;
+    fxFinish();
+    if (!reduceMotion()) {
+      $('reward').classList.add('leaving');
+      await wait(260);
+      if (my !== seq) return;
+    }
     setMode('idle', COPY.next);
   }
 
@@ -1004,7 +2071,7 @@ button { cursor: pointer; }
     try {
       buffer = await loadBuffer(song);
     } catch (e) {
-      buffer = sound('melody');
+      buffer = await soundAsync('melody');
       caption = 'Chưa mở được bài đã chọn, phát giai điệu có sẵn';
     }
     if (my !== seq) return;
@@ -1016,8 +2083,48 @@ button { cursor: pointer; }
     setMode('idle');
   }
 
-  function showReward(title, praise, withSong) {
-    $('rewardTitle').textContent = title;
+  // Chữ tiêu đề tách thành từng chữ cái để bật ra lần lượt; trình đọc màn hình vẫn đọc nguyên câu.
+  function setTitle(text, animated) {
+    const heading = $('rewardTitle');
+    if (!animated) { heading.textContent = text; return; }
+    const label = document.createElement('span');
+    label.className = 'vh';
+    label.textContent = text;
+    const shown = document.createElement('span');
+    shown.setAttribute('aria-hidden', 'true');
+    let index = 0;
+    text.normalize('NFC').split(' ').forEach((part, w) => {
+      if (w) shown.append(' ');
+      const word = document.createElement('span');
+      word.className = 'word';
+      Array.from(part).forEach((letter) => {
+        const ch = document.createElement('span');
+        ch.className = 'ch';
+        ch.style.setProperty('--i', index++);
+        ch.textContent = letter;
+        word.append(ch);
+      });
+      shown.append(word);
+    });
+    heading.replaceChildren(label, shown);
+  }
+
+  function showReward(title, praise, withSong, scene) {
+    const box = $('reward');
+    const look = scene || SONG_LOOK;
+    box.dataset.scene = look.look;
+    box.dataset.title = look.title;
+    box.dataset.move = look.move;
+    box.classList.toggle('is-song', !!withSong);
+    box.classList.remove('leaving', 'jolt', 'enter');
+    // Khung thưởng phồng ra từ chỗ nút True, như thể nút vừa bung ra.
+    const stage = $('stage').getBoundingClientRect();
+    const from = scene ? PADS.true.getBoundingClientRect() : null;
+    box.style.setProperty('--ox', from && stage.width ? ((from.left + from.width / 2 - stage.left) / stage.width * 100) + '%' : '50%');
+    box.style.setProperty('--oy', from && stage.height ? ((from.top + from.height / 2 - stage.top) / stage.height * 100) + '%' : '0%');
+    void box.offsetWidth;
+    box.classList.add('enter');
+    setTitle(title, !withSong);
     $('rewardPraise').textContent = praise;
     $('rewardPraise').hidden = !praise;
     $('rewardSong').textContent = '';
@@ -1124,7 +2231,7 @@ button { cursor: pointer; }
   }
 
   function loadBuffer(song) {
-    if (song.tune) return Promise.resolve(sound(song.tune));
+    if (song.tune) return soundAsync(song.tune);
     if (decoded.has(song.id)) {
       const hit = decoded.get(song.id);
       decoded.delete(song.id);
@@ -1514,6 +2621,15 @@ button { cursor: pointer; }
     pad.addEventListener('contextmenu', (event) => event.preventDefault());
   });
 
+  // Trong lúc ăn mừng, chạm vào màn hình để bóp bóng, bắn pháo hoa, rắc sao hoặc làm bóng nảy.
+  document.addEventListener('pointerdown', (event) => {
+    if (!fx.on || fx.fadeFrom || mode !== 'reward') return;
+    if (event.target.closest && event.target.closest('button, dialog, a, input, select, label')) return;
+    const def = FX[fx.kind];
+    if (def.tap) def.tap(event.clientX, event.clientY);
+  }, { passive: true });
+  window.addEventListener('resize', () => { if (fx.on) sizeCanvas(); });
+
   $('coachSong').addEventListener('click', () => playSong());
   $('stopBtn').addEventListener('click', () => { cancelAll(); setMode('idle'); });
 
@@ -1567,6 +2683,11 @@ button { cursor: pointer; }
   renderWhere();
   loadLocalSongs();
   cloudReady = connectCloud();
+  // Dựng sẵn tiếng của cảnh đầu tiên khi trang vừa tải xong; âm thanh vẫn chỉ phát sau lần chạm đầu.
+  setTimeout(() => {
+    if (!armed) prepareScene(SCENES[peekScene()]);
+    if (getWorker()) soundAsync('false');
+  }, 1200);
 })();
 </script>
 
