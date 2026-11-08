@@ -6,7 +6,7 @@ Trò chơi giúp bé nhận biết True và False qua âm thanh, dùng trên đi
 
 1. Hỏi bé một câu, ví dụ: "Đây là con mèo phải không?"
 2. Bấm True: máy reo "It's true!" rồi khen bé. Mỗi lần là một cảnh ăn mừng khác nhau, có nhạc tiệc riêng: pháo giấy, bóng bay, pháo hoa, mưa sao hoặc bóng nảy. Trong lúc ăn mừng, bé chạm vào màn hình để bóp bóng bay, bắn pháo hoa, rắc sao hoặc làm bóng nảy lên.
-3. Bấm False: máy đọc nhẹ nhàng "It's false.", không phát nhạc.
+3. Bấm False: nút lắc nhẹ với tiếng "uh-oh" (lần nào cũng giống nhau để bé nhận ra mình chọn chưa đúng), máy đọc nhẹ nhàng "It's false.", rồi ngôi sao động viên bé chọn lại và hai nút nhún mời bấm lại. Nếu lần ngay sau đó bé chọn True, lời khen sẽ khen sự cố gắng.
 4. Muốn nghe bài hát, bấm "Phát nhạc". Bài hát gồm vài giai điệu có sẵn và file nhạc tự thêm trên máy.
 
 Mọi âm thanh của True và False được tạo ngay trong trang, không cần tải file nào. Việc dựng nhạc chạy trong một Web Worker để hình không bị khựng; nơi nào chặn worker thì trang tự dựng nhạc trên luồng chính.
